@@ -15,7 +15,7 @@ package CharacterStates
 			
 			super(ATTACK_STATE, char);
 			
-			mAttackCountDown = 0.5;
+			mAttackCountDown = 0.2;
 			mCharacter.ChangeAnimation("idle", null);
 			
 			mId = ATTACK_STATE;
@@ -38,7 +38,7 @@ package CharacterStates
 		{
 			super.OnUpdate();
 			mCharacter.StopMoving();
-			if (mStateTimer >= 0.2)
+			if (mStateTimer >= mAttackCountDown)
 			{
 				mCharacter.ChangeState(new IdleState(0, mCharacter));
 			}
@@ -47,8 +47,6 @@ package CharacterStates
 		
 		public function AttackInDirection(dir:Point):void
 		{
-			var sz:Number = 20;
-			var len:Number = 10;
 			var attackObj:GameObject = new GameObject(mCharacter.x, mCharacter.y,null);
 		}
 	}

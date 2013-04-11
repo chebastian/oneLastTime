@@ -1,22 +1,29 @@
 package  
 {
+	import org.flixel.FlxG;
+	import org.flixel.FlxGroup;
 	/**
 	 * ...
 	 * @author Sebastian Ferngren
 	 */
-	public class WallNotifier extends NotifyListener 
+	public class WallNotifier extends EntityObserver
 	{
+		var mWalls:FlxGroup;
+		var mGame:PlayState;
 		
-		protected var mWall:RaisableWall;
-		public function WallNotifier(wall:RaisableWall) 
+		public function WallNotifier(game:PlayState, walls:FlxGroup) 
 		{
 			super(mUniqueId);
-			mWall = wall;
+			mWalls = walls;
+			mGame = game;
 		}
 		
 		override public function onNotify():void 
 		{
-			mWall.toggleOpenClosed();
+			for each(var wall:RaisableWall in mWalls.members)
+			{
+				mGame.ActiveLevel().setGlobalSwitchState(wall.toggleOpenClosed());
+			}
 			super.onNotify();
 		}
 		

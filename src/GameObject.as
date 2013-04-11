@@ -16,7 +16,7 @@ package
 		protected var mAABBOffset:Point;
 		protected var mAABBWidthOffset:Number;
 		protected var mAABBHeightOffset:Number;
-		protected var mNotfier:NotifyListener;
+		protected var mNotifier:EntityObserver;
 		
 		public static var DIR_LEFT = 0;
 		public static var DIR_RIGHT = 1;
@@ -37,11 +37,15 @@ package
 			mName = "";
 			drag.x = 0;
 			drag.y = 0;
-			mNotfier = new NotifyListener(mUniqueId);
+			mNotifier = new EntityObserver(mUniqueId);
 		}
 		
-		public function getNotifier():NotifyListener {
-			return mNotfier;
+		public function setObserver(observer:EntityObserver):void {
+			mNotifier = observer;
+		}
+		
+		public function getObserver():EntityObserver{
+			return mNotifier;
 		}
 		
 		public function Init():void
@@ -142,6 +146,16 @@ package
 			
 			return DIR_OOB;
 		}
+		
+		public function distanceBetween(obj:GameObject):Number 
+		{
+			var xd:Number = obj.x - x;
+			var yd:Number = obj.y - y;
+			var len:Number = (xd * xd) + (yd * yd);
+			return Math.sqrt(len);
+		}
+		
+		
 		
 		public function Equals(obj:GameObject):Boolean
 		{

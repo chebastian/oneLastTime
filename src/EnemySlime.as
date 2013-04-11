@@ -60,7 +60,7 @@ package
 		{
 			super.update();
 		}
-		
+			
 		override public function OnHitCharacter(char:Character):void 
 		{
 			if (char.Attacking() && char.IsFacingCharacter(this))

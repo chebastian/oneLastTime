@@ -15,7 +15,15 @@ package
 			loadGraphic(GameResources.RaisableWall, true, false, 32, 32, false);
 			Init();
 			mIsOpen = true;
-			mNotfier = new WallNotifier(this);
+			
+			this.velocity.x = 0;
+			this.velocity.y = 0;
+			this.acceleration.x = 0;
+			this.acceleration.y = 0;
+			
+			this.moves = false;
+			this.immovable = true;
+			solid = !mIsOpen;
 		}
 		
 		override public function Init():void 
@@ -29,6 +37,7 @@ package
 		public function setOpen(isOpen:Boolean):void
 		{
 			mIsOpen = isOpen;
+			solid = !mIsOpen;
 			changeAnimationState(mIsOpen);
 		}
 		
@@ -42,7 +51,7 @@ package
 		
 		public function toggleOpenClosed():Boolean
 		{
-			mIsOpen = !mIsOpen;
+			setOpen(!mIsOpen);
 			changeAnimationState(mIsOpen);
 			
 			return mIsOpen;

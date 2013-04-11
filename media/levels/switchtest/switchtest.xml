@@ -19,7 +19,7 @@
 <gameObjects>
 <door open="false" x="5" y="6"/>
 <door open="false" x="5" y="6"/>
-<door open="false" x="9" y="5"/>
+<doorSwitch open="false" x="9" y="5"/>
 </gameObjects>
 </room>
 <room file="Room23444444.xml" id="4" indexX="0" indexY="1" name="Room23444444">

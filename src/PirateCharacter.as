@@ -1,5 +1,6 @@
 package  
 {
+	import CharacterStates.AttackState;
 	import flash.geom.Point;
 	import PlayerCharacter;
 	import org.flixel.*;
@@ -62,6 +63,10 @@ package
 			{
 				Move(new Point( 0, 1), speed);
 				ChangeAnimation(Character.Animation_WalkDown, GameResources.Player_Sheet);
+			}
+			else if (FlxG.keys.justPressed("A")) 
+			{
+				ChangeState(new AttackState(this));
 			}
 			else
 			{

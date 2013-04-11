@@ -26,6 +26,7 @@ package
 		var mMinimapPos:Point;
 		var mMiniMap:MiniMap;
 		var mPickups:FlxGroup;
+		var mSwitchState:Boolean;
 		
 		var mGameObjects:FlxGroup;
 		
@@ -44,6 +45,7 @@ package
 			mWorkingDir = "../media/levels/";
 			mLevelName = "";
 			mGameObjects = new FlxGroup();
+			mSwitchState = false;
 		}
 		
 		public function AddPickup(item:Pickup):void
@@ -68,6 +70,7 @@ package
 			}
 			
 			mActiveRoom.HandlePlayerEnemyCollision(mGame.ActivePlayer());
+			mActiveRoom.handlePlayerWallCollision(mGame.ActivePlayer());
 		}
 		
 		protected function ChangeRoomByBounds(bound:uint):Boolean
@@ -204,7 +207,7 @@ package
 						}
 					}
 					var room:CellRoom = new CellRoom(mGame, id, file);
-					ParseGameObjects(node.gameObjects,room);
+					ParseGameObjects(node.gameObjects, room);
 					AddRoomAtIndex(room, pos);
 				 }
 				 
@@ -260,7 +263,8 @@ package
 				var wall:RaisableWall = new RaisableWall(pos.x * 32, pos.y * 32);
 				wall.setOpen(open);
 				mGameObjects.add(wall);
-				room.AddGameObjects(wall);
+				//room.AddGameObjects(wall);
+				room.addRaisableWall(wall);
 			}
 		}
 		
@@ -287,10 +291,10 @@ package
 				}
 				}
 				
-				var wall:WallSwitch= new WallSwitch(pos.x * 32, pos.y * 32);
-				wall.setOpen(open);
-				mGameObjects.add(wall);
-				room.AddGameObjects(wall);
+				var wallSwitch:WallSwitch= new WallSwitch(mGame,pos.x * 32, pos.y * 32);
+				wallSwitch.setOpen(open);
+				//mGameObjects.add(wallSwitch);
+				room.addWallSwitch(wallSwitch);
 		}
 		}
 		 
@@ -468,6 +472,14 @@ package
 		public function ActiveRoom():CellRoom
 		{
 			return mActiveRoom;
+		}
+		
+		public function getGlobalSwitchState():Boolean {
+			return mSwitchState;
+		}
+		
+		public function setGlobalSwitchState(status:Boolean):void {
+			mSwitchState = status;
 		}
 	}
 

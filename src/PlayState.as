@@ -16,6 +16,7 @@ package
 	import org.flixel.FlxG;
 	import org.flixel.FlxObject;
 	import LevelMap;
+	import org.flixel.FlxTileblock;
 	import org.flixel.system.FlxList;
 	import TransitionEffect;
 	import Character;
@@ -37,6 +38,7 @@ package
 		var mSlime:EnemySlime;
 		
 		public var LAYER_BKG:FlxGroup;
+		public var LAYER_BKG1:FlxGroup;
 		public var LAYER_MID:FlxGroup;
 		public var LAYER_ITEM:FlxGroup;
 		public var LAYER_ENEMY:FlxGroup;
@@ -59,7 +61,7 @@ package
 			mTransEffect = new TransitionEffect(this);
 			mTransEffect.init(20, 20, 5);
 			mTransEffect.addEventListener("Fade Complete", FadeComplete);
-			mPlayer = new PirateCharacter(this, new Point(64, 40));
+			mPlayer = new PirateCharacter(this, new Point(300, 200));
 			PlayerCurrentItems = new FlxGroup();
 			
 			LAYER_MID.add(mPlayer);
@@ -111,12 +113,14 @@ package
 		public function CreateLayers():void
 		{
 				LAYER_BKG = new FlxGroup();
+				LAYER_BKG1 = new FlxGroup();
 				LAYER_MID = new FlxGroup();
 				LAYER_ITEM = new FlxGroup();
 				LAYER_ENEMY = new FlxGroup();
 				LAYER_FRONT = new FlxGroup();
 				
 				add(LAYER_BKG);
+				add(LAYER_BKG1);
 				add(LAYER_ITEM);
 				add(LAYER_MID);
 				add(LAYER_ENEMY);
@@ -192,8 +196,23 @@ package
 			{
 				mCellLevel.ChangeRoomInDirection(new Point(1,0));
 			}
-		}
-		
+			
+			if (FlxG.keys.justPressed('END')) {
+				mCellLevel.ActiveRoom().testSwitch();
+			}
+			}
+			
+			if (FlxG.keys.justPressed('F1'))
+			{
+				var tile:FlxTileblock = mCellLevel.ActiveRoom().getRandomTile();
+				if (tile == null)
+					return;
+					
+				var pos:Point = new Point(tile.x * tile.width, tile.y * tile.height);
+				var enemy:EnemySlime = new EnemySlime(this, pos);
+				
+				mCellLevel.ActiveRoom().addEnemyToRoom(enemy);
+			}
 		}
 		
 		public function HandleEnemyCollision():void

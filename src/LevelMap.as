@@ -58,7 +58,7 @@ package
 				else if (i == 2)
 					game.LAYER_BKG.add(mLayers[i]);
 				else if (i == 1)
-					game.LAYER_ITEM.add(mLayers[i]);
+					game.LAYER_BKG1.add(mLayers[i]);
 				else if (i == 0)
 				{
 					var map:FlxTilemap =  mLayers[i];
@@ -224,7 +224,7 @@ package
 				var index_x:uint = Math.random() * 16;
 				var index_y:uint = Math.random() * 15;
 				
-				if (getTile(index_x, index_y) == 1)
+				if (mCollisionMap.getTile(index_x, index_y) != mCollisionIndex)
 				{
 					t = new FlxTileblock(index_x, index_y, 16, 16);
 					found = true;

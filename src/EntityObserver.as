@@ -4,11 +4,11 @@ package
 	 * ...
 	 * @author Sebastian Ferngren
 	 */
-	public class NotifyListener 
+	public class EntityObserver 
 	{
 		protected var mUniqueId:int;
 		
-		public function NotifyListener(uniqueId:int) 
+		public function EntityObserver(uniqueId:int) 
 		{
 			mUniqueId = uniqueId;
 		}
@@ -21,8 +21,6 @@ package
 		{
 			return mUniqueId;
 		}
-		
-		
 		
 	}
 

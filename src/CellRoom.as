@@ -11,6 +11,7 @@ package
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
 	import flash.net.URLRequestMethod;
+	import mx.core.FlexApplicationBootstrap;
 	import org.flixel.FlxG;
 	import org.flixel.*;
 	import LevelMap;
@@ -34,6 +35,10 @@ package
 		var mGroupEnemies:FlxGroup;
 		var mGameObjects:FlxGroup;
 		var mWallSwitches:FlxGroup;
+		var mRaisableWalls:FlxGroup;
+		var mSolidObjects:FlxGroup;
+		
+		var mWallNotifier:WallNotifier;
 		
 		var mDataTiles:String;
 		var mDataCollision:String;
@@ -45,7 +50,7 @@ package
 		var mDebugString:FlxText;
 		var mClearedEvents:Array;
 		var mPickups:FlxGroup;
-	
+		
 		static var FILE_EMPTY_ROOM:String = "../media/levels/level_1/empty.xml";
 		
 		public static var 	BOUNDS_UP:uint = 0;
@@ -88,6 +93,10 @@ package
 			mClearedEvents = new Array(EVT_NUM);
 			mPickups = new FlxGroup();
 			mGameObjects = new FlxGroup();
+			mWallNotifier = new WallNotifier(mGame,mGameObjects);
+			mWallSwitches = new FlxGroup();
+			mRaisableWalls = new FlxGroup();
+			mSolidObjects = new FlxGroup();
 			
 			mEmpty = path.toUpperCase == FILE_EMPTY_ROOM.toUpperCase;
 		}
@@ -103,19 +112,32 @@ package
 			LoadLevel(mRoomFilePath);
 			SetRoomGoals();
 			mGame.LAYER_ENEMY.add(mGameObjects);
-			mGame.LAYER_ITEM.add(mPickups);
+			mGame.LAYER_ITEM.add(mRaisableWalls);
+			mGame.LAYER_ITEM.add(mWallSwitches);
 			
+			mGame.LAYER_ITEM.add(mPickups);
+			bindSwitches();
+			
+			mSolidObjects.add(mRaisableWalls);
+			mSolidObjects.add(mWallSwitches);
 			//mMap.AddLayersToStage(mGame);
 		}
 		
 		public function bindSwitches():void 
 		{
-			for (var doorSwitch:WallSwitch in mWallSwitches)
+			mWallNotifier = new WallNotifier(mGame,mRaisableWalls);
+
+			for each(var doorSwitch:WallSwitch in mWallSwitches.members)
 			{
-				doorSwitch
+				doorSwitch.addNotifier(mWallNotifier);
+				doorSwitch.setOpen(mGame.ActiveLevel().getGlobalSwitchState());
+			}
+			for each(var wall:RaisableWall in mRaisableWalls.members)
+			{
+				wall.setOpen(mGame.ActiveLevel().getGlobalSwitchState());
 			}
 		}
-		
+			
 		protected function SetRoomGoals():void 
 		{
 			if (mGroupEnemies.length > 0)
@@ -179,8 +201,15 @@ package
 				door.kill();
 				door.exists = false;
 			}
-				
+			mSolidObjects.clear();
+			
+			clearLayersUsed();
+		}
+		
+		protected function clearLayersUsed():void 
+		{
 			mGame.LAYER_BKG.clear();
+			mGame.LAYER_BKG1.clear();
 			mGame.LAYER_ENEMY.clear();
 			mGame.LAYER_ITEM.clear();
 			mGame.LAYER_FRONT.clear();
@@ -193,6 +222,7 @@ package
 			
 			FlxG.collide(mGroupEnemies, mMap);
 			
+			handlePlayerHitSwitch(mGame.ActivePlayer());
 			ProcessRoomGoals();
 		}
 		
@@ -228,7 +258,23 @@ package
 				player.OnHitCharacter(enemy);
 				enemy.OnHitCharacter(player);
 			}
-
+		}
+		
+		public function handlePlayerWallCollision(player:PlayerCharacter):void
+		{
+			if (FlxG.collide(player, mSolidObjects))
+			{
+				
+			}
+		}
+		
+		public function handlePlayerHitSwitch(player:PlayerCharacter):void 
+		{
+			for each(var sw:WallSwitch in mWallSwitches.members)
+			{
+				if(player.Attacking())
+					sw.onHit(player);
+			}
 		}
 		
 		public function PlayerReachExit(player:Character):uint
@@ -451,6 +497,12 @@ package
 			}
 		}
 		
+		public function addEnemyToRoom(enemy:Enemy)
+		{
+			mGame.LAYER_ENEMY.add(enemy);
+			mGroupEnemies.add(enemy);
+		}
+		
 		protected function ParseTreasuresFromXml(node:XMLList):Boolean
 		{
 			for each(var treasure in node)
@@ -547,6 +599,14 @@ package
 			mGameObjects.add(obj);
 		}
 		
+		public function addWallSwitch(s:WallSwitch):void {
+			mWallSwitches.add(s);
+		}
+		
+		public function addRaisableWall(r:RaisableWall):void {
+			mRaisableWalls.add(r);
+		}
+		
 		public function setId(id:uint):void
 		{
 			mUniqueId = id;
@@ -556,7 +616,16 @@ package
 		{
 			mRoomFilePath = path;
 		}
-	
+		
+		public function testSwitch():void {
+			for each(var wallS:WallSwitch in mWallSwitches.members) {
+				wallS.onHit(mGame.ActivePlayer());
+			}
+		}
+			
+		public function getRandomTile():FlxTileblock {
+			return mMap.GetRandomFloorTile();
+		}
 	}
 
 }
