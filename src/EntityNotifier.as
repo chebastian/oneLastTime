@@ -9,23 +9,23 @@ package
 	 */
 	public class EntityNotifier 
 	{
-		var mListeners:Vector.<NotifyListener>;
+		var mListeners:Vector.<EntityObserver>;
 		var mLastTime:uint;
 		var mTimeBetweenNotifications:uint;
 
 		public function EntityNotifier() 
 		{
-			mListeners = new Vector.<NotifyListener>();
+			mListeners = new Vector.<EntityObserver>();
 			mTimeBetweenNotifications = 0;
 			mLastTime = 0;
 		}
 			
-		public function addListener(listener:NotifyListener) 
+		public function registerObserver(listener:EntityObserver) 
 		{
 			mListeners.push(listener);
 		}
 		
-		public function removeListener(listener:NotifyListener) 
+		public function unregisterObserver(listener:EntityObserver) 
 		{
 			for (var i:int = 0; i < mListeners.length; i++)
 			{
@@ -36,7 +36,7 @@ package
 			}
 		}
 		
-		public function notify()
+		public function notify():void
 		{
 			var now:uint = FlxU.getTicks();
 			
@@ -55,6 +55,11 @@ package
 		
 		public function setNotificationCooldown(milliseconds:uint):void {
 			mTimeBetweenNotifications = milliseconds;
+		}
+		
+		public function isReady():Boolean
+		{
+			return mTimeBetweenNotifications <= FlxU.getTicks() - mLastTime;
 		}
 	}
 

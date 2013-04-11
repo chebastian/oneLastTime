@@ -16,7 +16,7 @@ package
 		protected var mAABBOffset:Point;
 		protected var mAABBWidthOffset:Number;
 		protected var mAABBHeightOffset:Number;
-		protected var mNotifier:EntityObserver;
+		protected var mNotifier:EntityNotifier;
 		
 		public static var DIR_LEFT = 0;
 		public static var DIR_RIGHT = 1;
@@ -37,14 +37,14 @@ package
 			mName = "";
 			drag.x = 0;
 			drag.y = 0;
-			mNotifier = new EntityObserver(mUniqueId);
+			mNotifier = new EntityNotifier();
 		}
 		
-		public function setObserver(observer:EntityObserver):void {
-			mNotifier = observer;
+		public function setNotifier(notifier:EntityNotifier):void {
+			mNotifier = notifier;
 		}
 		
-		public function getObserver():EntityObserver{
+		public function getNotifier():EntityNotifier{
 			return mNotifier;
 		}
 		

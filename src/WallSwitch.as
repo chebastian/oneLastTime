@@ -63,8 +63,11 @@ package
 		
 		public function toggleOpen():Boolean 
 		{
+			if (!mNotifier.isReady())
+				return mIsOpen;
+				
 			setOpen(!mIsOpen);
-			mNotifier.onNotify();
+			mNotifier.notify();
 			
 			return mIsOpen;
 		}

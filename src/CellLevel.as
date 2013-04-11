@@ -24,7 +24,7 @@ package
 		var mActiveRoom:CellRoom;
 		var mActiveIndex:Point;
 		var mMinimapPos:Point;
-		var mMiniMap:MiniMap;
+		var mMiniMap:MiniMap
 		var mPickups:FlxGroup;
 		var mSwitchState:Boolean;
 		
