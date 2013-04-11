@@ -1,4 +1,4 @@
-package  
+package
 {
 	import CharacterStates.IdleState;
 	import flash.accessibility.Accessibility;
@@ -10,8 +10,10 @@ package
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
+	import flash.xml.XMLNode;
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxPoint;
+	
 	/**
 	 * ...
 	 * @author Sebastian Ferngren
@@ -27,6 +29,7 @@ package
 		var mMiniMap:MiniMap
 		var mPickups:FlxGroup;
 		var mSwitchState:Boolean;
+		var mLevelFilePath:String;
 		
 		var mGameObjects:FlxGroup;
 		
@@ -38,7 +41,7 @@ package
 			super(new Point(0, 0), game);
 			mActiveIndex = new Point(0, 0);
 			mRoomList = new Array();
-			mActiveRoom = new CellRoom(mGame, 0,"");
+			mActiveRoom = new CellRoom(mGame, 0, "");
 			mClearedRooms = new Array();
 			mPickups = new FlxGroup();
 			mMiniMap = new MiniMap(this, -50, 0);
@@ -53,19 +56,19 @@ package
 			mPickups.add(item);
 		}
 		
-		override public function update():void 
+		override public function update():void
 		{
 			super.update();
 			mActiveRoom.update();
 			HandlePlayerExit();
 		}
 		
-		protected function HandlePlayerExit():void	
+		protected function HandlePlayerExit():void
 		{
 			var exitIndex:uint = mActiveRoom.PlayerReachExit(mGame.ActivePlayer());
 			if (exitIndex != CellRoom.BOUNDS_NONE)
 			{
-				if(ChangeRoomByBounds(exitIndex))
+				if (ChangeRoomByBounds(exitIndex))
 					mActiveRoom.HandlePlayerExit(mGame.ActivePlayer(), exitIndex);
 			}
 			
@@ -78,29 +81,30 @@ package
 			if (bound == CellRoom.BOUNDS_NONE)
 				return false;
 			
-			switch(bound)
+			switch (bound)
 			{
-				case CellRoom.BOUNDS_LEFT:
-					return ChangeRoomInDirection(new Point( -1, 0));
+				case CellRoom.BOUNDS_LEFT: 
+					return ChangeRoomInDirection(new Point(-1, 0));
 					break;
-				case CellRoom.BOUNDS_RIGHT:
+				case CellRoom.BOUNDS_RIGHT: 
 					return ChangeRoomInDirection(new Point(1, 0));
 					break;
-				case CellRoom.BOUNDS_UP:
+				case CellRoom.BOUNDS_UP: 
 					return ChangeRoomInDirection(new Point(0, -1));
 					break;
-				case CellRoom.BOUNDS_DOWN:
+				case CellRoom.BOUNDS_DOWN: 
 					return ChangeRoomInDirection(new Point(0, 1));
 					break;
-				default:
+				default: 
 					return false;
-					
+			
 			}
 			return true;
 		}
 		
 		public function LoadLevel(path:String):Boolean
 		{
+			mLevelFilePath = path;
 			var xmlLoader:URLLoader = new URLLoader();
 			var xmlData:XML = new XML();
 			
@@ -122,13 +126,12 @@ package
 			
 			ParseLevelRooms(levelList);
 			
-			
 			ChangeRoom(new Point(0, 0));
 			mMiniMap = new MiniMap(this, 0, 0);
 			mMiniMap.GenerateMap();
-			
+		
 			//mGame.add(mMiniMap);
-		}	
+		}
 		
 		protected function ParseLevelInfo(nodes:XMLList):Boolean
 		{
@@ -136,7 +139,7 @@ package
 			var index:Point = new Point();
 			var sz:Point = new Point();
 			
-			for each(var attr in nodes)
+			for each (var attr in nodes)
 			{
 				if (attr.name() == "id")
 				{
@@ -161,10 +164,10 @@ package
 		
 		public function CreateEmptyLevel():void
 		{
-			mRoomList = new Array(width*height);
-			for (var i:uint = 0; i < width*height; i++)
+			mRoomList = new Array(width * height);
+			for (var i:uint = 0; i < width * height; i++)
 			{
-				var emptyRoom:CellRoom = new CellRoom(mGame,0, CellRoom.FILE_EMPTY_ROOM);
+				var emptyRoom:CellRoom = new CellRoom(mGame, 0, CellRoom.FILE_EMPTY_ROOM);
 				emptyRoom.SetMapIndex(IndexToPos(i));
 				mRoomList[i] = emptyRoom;
 				mClearedRooms[i] = new CellEvent(emptyRoom, emptyRoom.GetUniqueId(), false);
@@ -172,52 +175,81 @@ package
 		}
 		
 		protected function ParseLevelRooms(nodes:XMLList):Boolean
-		 {
-			 for each(var node in nodes)
-			 {
-				 var id:uint = new uint();
-				 var pos:Point = new Point();
-				 var file:String = new String();
-				 trace(node.name()); 
-				 
-				 if (node.name() == "room")
-				 {
-					for each(var attributes in node.attributes())
+		{
+			for each (var node in nodes)
+			{
+				var id:uint = new uint();
+				var pos:Point = new Point();
+				var file:String = new String();
+				trace(node.name());
+				
+				if (node.name() == "room")
+				{
+					var room:CellRoom = createRoomFromNode(node);
+					AddRoomAtIndex(room, room.MapIndex());
+				}
+				
+			}
+			return true;
+		}
+		
+		public function getRoomNodeFromXmlByName(xml:XML, name:String):XML
+		{
+			var roomList:XMLList = xml.rooms.room;
+			
+			for each(var room in roomList)
+			{
+				for each(var attribute in room.attributes())
+				{
+					if (attribute.name() == "name")
 					{
-						if (attributes.name() == "id")
-						{
-							id = parseInt( attributes );
-						}
-						
-						else if (attributes.name() == "indexX")
-						{
-							pos.x = parseFloat( attributes );
-						}
-						
-						else if (attributes.name() == "indexY")
-						{
-							pos.y = parseFloat( attributes );
-						}
-						
-						else if (attributes.name() == "file")
-						{
-							file = attributes;
-							
-							file = MatchFilepathToDir(file, mWorkingDir);
-						}
+						if (attribute == name)
+							return room;
 					}
-					var room:CellRoom = new CellRoom(mGame, id, file);
-					ParseGameObjects(node.gameObjects, room);
-					AddRoomAtIndex(room, pos);
-				 }
-				 
-			 }
-			 return true;
-		 
-		 }
-		 
-		 
-		protected function ParseGameObjects(nodes:XMLList,room:CellRoom):void {
+				}
+			}
+			
+			return null;
+		}
+		
+		public function createRoomFromNode(node:XML):CellRoom
+		{
+			var id:uint = new uint();
+			var pos:Point = new Point();
+			var file:String = new String();
+			for each (var attributes in node.attributes())
+			{
+				if (attributes.name() == "id")
+				{
+					id = parseInt(attributes);
+				}
+				
+				else if (attributes.name() == "indexX")
+				{
+					pos.x = parseFloat(attributes);
+				}
+				
+				else if (attributes.name() == "indexY")
+				{
+					pos.y = parseFloat(attributes);
+				}
+				
+				else if (attributes.name() == "file")
+				{
+					file = attributes;
+					
+					file = MatchFilepathToDir(file, mWorkingDir);
+				}
+			}
+			var room:CellRoom = new CellRoom(mGame, id, file);
+			room.SetMapIndex(new Point(pos.x, pos.y));
+			ParseGameObjects(node.gameObjects, room);
+			
+			return room;
+		}
+		
+		protected function ParseGameObjects(nodes:XMLList, room:CellRoom):void
+		{
 			var doors:XMLList = nodes.door;
 			var switches:XMLList = nodes.doorSwitch;
 			
@@ -225,7 +257,7 @@ package
 			parseDoors(doors, room);
 			parseGameObj(nodes, room, "doorSwitch");
 			//mGame.LAYER_ENEMY.add(mGameObjects);
-			
+		
 		}
 		
 		public function parseGameObj(nodes:XMLList, room:CellRoom, name:String):void
@@ -239,25 +271,25 @@ package
 		
 		private function parseDoors(nodes:XMLList, room:CellRoom)
 		{
-			for each(var node in nodes)
+			for each (var node in nodes)
 			{
 				var pos:FlxPoint = new FlxPoint();
 				var open:Boolean = false;
-			
-				for each(var attribute in node.attributes())
+				
+				for each (var attribute in node.attributes())
 				{
-				if (attribute.name() == "x")
-				{
-					pos.x = parseInt(attribute);
-				}
-				else if (attribute.name() == "y")
-				{
-					pos.y = parseInt(attribute);
-				}
-				else if (attribute.name() == "open")
-				{
-					open = attribute == true;
-				}
+					if (attribute.name() == "x")
+					{
+						pos.x = parseInt(attribute);
+					}
+					else if (attribute.name() == "y")
+					{
+						pos.y = parseInt(attribute);
+					}
+					else if (attribute.name() == "open")
+					{
+						open = attribute == true;
+					}
 				}
 				
 				var wall:RaisableWall = new RaisableWall(pos.x * 32, pos.y * 32);
@@ -268,75 +300,75 @@ package
 			}
 		}
 		
-		private function parseSwitches(nodes:XMLList, room:CellRoom) 
+		private function parseSwitches(nodes:XMLList, room:CellRoom)
 		{
-			for each(var node in nodes)
+			for each (var node in nodes)
 			{
 				var pos:FlxPoint = new FlxPoint();
 				var open:Boolean = false;
-			
-				for each(var attribute in node.attributes())
+				
+				for each (var attribute in node.attributes())
 				{
-				if (attribute.name() == "x")
-				{
-					pos.x = parseInt(attribute);
-				}
-				else if (attribute.name() == "y")
-				{
-					pos.y = parseInt(attribute);
-				}
-				else if (attribute.name() == "open")
-				{
-					open = attribute == true;
-				}
+					if (attribute.name() == "x")
+					{
+						pos.x = parseInt(attribute);
+					}
+					else if (attribute.name() == "y")
+					{
+						pos.y = parseInt(attribute);
+					}
+					else if (attribute.name() == "open")
+					{
+						open = attribute == true;
+					}
 				}
 				
-				var wallSwitch:WallSwitch= new WallSwitch(mGame,pos.x * 32, pos.y * 32);
+				var wallSwitch:WallSwitch = new WallSwitch(mGame, pos.x * 32, pos.y * 32);
 				wallSwitch.setOpen(open);
 				//mGameObjects.add(wallSwitch);
 				room.addWallSwitch(wallSwitch);
+			}
 		}
-		}
-		 
-		 private function MatchFilepathToDir(file:String, path:String):String
-		 {
-			 var fullpath:String = "";
-			 
-			 var res:int = file.search(path);
-			 if (res != -1)
-			 {
-				 return file;
-			 }
-			 
-			 fullpath += path + mLevelName + "/" + file;
-			 
-			 return fullpath;
-		 }
 		
-		 public function AddRoom(id:uint, pos:Point, file:String):Boolean
-		 {
-			 
-			 var room:CellRoom = new CellRoom(mGame,id, file);
-			 room.SetMapIndex(pos);
-			 
-			 if (GetRoomAtIndex(pos) == null)
-				 return false;
-			 
-			 mRoomList[PosToIndex(pos)] = room;
-			 
-			 return true;
-		 }
-		 
-		 public function AddRoomAtIndex(room:CellRoom, index:Point):Boolean
-		 {
-			 if (GetRoomAtIndex(index) == null)
+		private function MatchFilepathToDir(file:String, path:String):String
+		{
+			var fullpath:String = "";
+			
+			var res:int = file.search(path);
+			if (res != -1)
+			{
+				return file;
+			}
+			
+			fullpath += path + mLevelName + "/" + file;
+			
+			return fullpath;
+		}
+		
+		public function AddRoom(id:uint, pos:Point, file:String):Boolean
+		{
+			
+			var room:CellRoom = new CellRoom(mGame, id, file);
+			room.SetMapIndex(pos);
+			
+			if (GetRoomAtIndex(pos) == null)
 				return false;
-				
-			 mRoomList[PosToIndex(index)] = room;
-			 
-			 return true;
-		 }
-		 
+			
+			mRoomList[PosToIndex(pos)] = room;
+			
+			return true;
+		}
+		
+		public function AddRoomAtIndex(room:CellRoom, index:Point):Boolean
+		{
+			if (GetRoomAtIndex(index) == null)
+				return false;
+			
+			mRoomList[PosToIndex(index)] = room;
+			
+			return true;
+		}
+		
 		protected function ChangeRoom(index:Point):Boolean
 		{
 			var nextRoom:CellRoom = GetRoomAtIndex(index);
@@ -344,7 +376,6 @@ package
 			if (nextRoom == null)
 				return false;
 			
-				
 			ExitCurrentRoom();
 			mActiveIndex = index;
 			EnterNextRoom(nextRoom);
@@ -353,7 +384,7 @@ package
 			return true;
 		}
 		
-		protected function ExitCurrentRoom():void 
+		protected function ExitCurrentRoom():void
 		{
 			if (mActiveRoom != null)
 			{
@@ -399,7 +430,7 @@ package
 			return false;
 		}
 		
-		protected function UpdateMiniMap():void 
+		protected function UpdateMiniMap():void
 		{
 			if (mMiniMap != null)
 			{
@@ -418,7 +449,7 @@ package
 			var room:CellRoom = GetRoomAtIndex(pos);
 			if (room == null)
 				return false;
-				
+			
 			return !room.EmptyRoom();
 		}
 		
@@ -436,7 +467,7 @@ package
 			
 			if (index.x >= width || index.y >= height || index.y < 0 || index.x < 0)
 				return null;
-				
+			
 			return mRoomList[numIndex];
 		}
 		
@@ -474,12 +505,62 @@ package
 			return mActiveRoom;
 		}
 		
-		public function getGlobalSwitchState():Boolean {
+		public function getGlobalSwitchState():Boolean
+		{
 			return mSwitchState;
 		}
 		
-		public function setGlobalSwitchState(status:Boolean):void {
+		public function setGlobalSwitchState(status:Boolean):void
+		{
 			mSwitchState = status;
+		}
+		
+		public function testreloadLevel():void {
+				testClearLevel();
+				LoadLevel(mLevelFilePath);
+		}
+		
+		public function testClearLevel():void {
+			mGame.LAYER_BKG.clear();
+			mGame.LAYER_BKG1.clear();
+			mGame.LAYER_ENEMY.clear();
+			mGame.LAYER_ITEM.clear();
+			//mGame.LAYER_MID.clear();
+			mGame.LAYER_FRONT.clear();
+			mGameObjects.clear();
+			
+			mActiveIndex = new Point(0, 0);
+			mRoomList = new Array();
+			mActiveRoom = new CellRoom(mGame, 0, "");
+			mClearedRooms = new Array();
+			mPickups = new FlxGroup();
+			mMiniMap = new MiniMap(this, -50, 0);
+			mWorkingDir = "../media/levels/";
+			mLevelName = "";
+			mGameObjects = new FlxGroup();
+			mSwitchState = false;
+		}
+		
+		public function reloadRoom(room:CellRoom):void
+		{
+			var xmlLoader:URLLoader = new URLLoader();
+			var xml:XML = new XML();
+			xmlLoader.addEventListener(Event.COMPLETE, onReloadLevel);
+			
+			xmlLoader.load(new URLRequest(mLevelFilePath));
+			/*mLevelFilePath = path;
+			var xmlLoader:URLLoader = new URLLoader();
+			var xmlData:XML = new XML();
+			
+			xmlLoader.addEventListener(Event.COMPLETE, OnLoadLevel);
+			xmlLoader.load(new URLRequest(path));
+			return true;*/
+		}
+		
+		public function onReloadLevel(e:Event):void {
+			var xmlData:XML = new XML(e.target.data);
+			var xmlList:XMLList = xmlData.data;
+			//var room = getRoomNodeFromXmlByName(xmlList, ActiveRoom().GetName());
 		}
 	}
 

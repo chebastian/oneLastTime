@@ -218,6 +218,11 @@ package
 			{
 				mCellLevel.ActiveRoom().reloadRoom();
 			}
+			
+			if (FlxG.keys.justPressed('F3'))
+			{
+				mCellLevel.testreloadLevel();
+			}
 		}
 		
 		public function HandleEnemyCollision():void

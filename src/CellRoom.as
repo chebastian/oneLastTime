@@ -367,7 +367,7 @@ package
 			
 			for each(var node in Ldata)
 			{
-				var attributes:XMLList = node.attributes();
+				var attributes:XMLList = node.attributes();	
 				var tiles:String = "";
 				var colTiles:String = "";
 				var newLevel:LevelMap = new LevelMap();
