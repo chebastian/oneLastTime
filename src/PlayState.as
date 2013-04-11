@@ -213,6 +213,11 @@ package
 				
 				mCellLevel.ActiveRoom().addEnemyToRoom(enemy);
 			}
+			
+			if (FlxG.keys.justPressed('F2'))
+			{
+				mCellLevel.ActiveRoom().reloadRoom();
+			}
 		}
 		
 		public function HandleEnemyCollision():void

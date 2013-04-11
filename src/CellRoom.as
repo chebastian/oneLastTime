@@ -626,6 +626,10 @@ package
 		public function getRandomTile():FlxTileblock {
 			return mMap.GetRandomFloorTile();
 		}
+		
+		public function reloadRoom():void {
+			this.LoadLevel(mRoomFilePath);
+		}
 	}
 
 }
