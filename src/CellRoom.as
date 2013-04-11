@@ -628,7 +628,8 @@ package
 		}
 		
 		public function reloadRoom():void {
-			this.LoadLevel(mRoomFilePath);
+			this.ClearLevel();
+			this.OnEnter();
 		}
 	}
 
