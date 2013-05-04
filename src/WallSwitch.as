@@ -81,11 +81,13 @@ package
 		}
 		
 		public function onHit(obj:GameObject) {
-			var len:Number = distanceBetween(obj);
+			/*var len:Number = distanceBetween(obj);
 			if (len < this.width + obj.width)
 			{
 				toggleOpen();
-			}
+			}*/
+			if (obj.overlaps(this))
+				toggleOpen();
 		}
 		
 	}

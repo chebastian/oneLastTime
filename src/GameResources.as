@@ -12,6 +12,10 @@ package
 			
 		}
 		
+		public function getResource(name:String):Class
+		{
+		}
+		
 		//
 		// Level Tiles
 		//
@@ -49,6 +53,8 @@ package
 		[Embed(source = "../media/Player_sheet.png")]
 		public static var Player_Sheet:Class;
 		
+		[Embed(source = "../media/player_attack.png")]
+		public static var Player_Attack:Class;
 		
 		
 		//

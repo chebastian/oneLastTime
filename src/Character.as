@@ -14,11 +14,16 @@ package
 	public class Character extends GameObject
 	{
 		
-		static var Animation_Idle:String = "idle";
-		static var Animation_WalkLeft:String = "walkLeft";
-		static var Animation_WalkRight:String = "walkRight";
-		static var Animation_WalkUp:String = "walkUp";
-		static var Animation_WalkDown:String = "walkDown";
+		public static var Animation_Idle:String = "idle";
+		public static var Animation_WalkLeft:String = "walkLeft";
+		public static var Animation_WalkRight:String = "walkRight";
+		public static var Animation_WalkUp:String = "walkUp";
+		public static var Animation_WalkDown:String = "walkDown";
+		
+		public static var Animation_Attack_R:String = "attackR";
+		public static var Animation_Attack_L:String = "attackL";
+		public static var Animation_Attack_D:String = "attackD";
+		public static var Animation_Attack_U:String = "attackU";
 		
 		var mCurrentAnimation:String;
 		
@@ -40,8 +45,12 @@ package
 		
 		var mHitBoxPosOffset:Point;
 		var mHitBoxSizeOffset:Point;
-		
 		var srcWH:Point;
+		
+		
+		/*TEMP FOR ATTACKING*/
+		var mAnimations:AnimationBank;
+		var mCurrentImg:Class;
 		
 		public function Character(game:PlayState, _x:Number, _y:Number) 
 		{
@@ -59,6 +68,7 @@ package
 			mIsAttacking = false;
 			mAnimationFrameRate = 10;
 			srcWH = new Point(32, 32);
+			mAnimations = new AnimationBank();
 			Init();
 		}
 		
@@ -84,8 +94,24 @@ package
 			addAnimation(Animation_WalkUp,[0,1,2,3,4,5,6,7],mAnimationFrameRate);
 			addAnimation(Animation_WalkRight, [0, 1, 2, 3, 4, 5, 6], mAnimationFrameRate);
 			
+			
 			mCurrentAnimation = "";
 			ChangeAnimation(Animation_Idle, GameResources.Anim_LinkWalkDown);
+			
+			
+		}
+		public function addClip(clip:AnimationClip)
+		{
+			mAnimations.addAnimation(clip);
+			addAnimation(clip.name, clip.frames, clip.fps, clip.looped);
+		}
+		
+		public function addAnimationClip(name:String, frames:Array, fps:Number, fw:Number, fh:Number, loop:Boolean,img:Class)
+		{
+			addAnimation(name, frames, fps, loop);
+			var clip:AnimationClip = new AnimationClip(name, frames, fw, fh, img);
+			clip.fps = fps;
+			mAnimations.addAnimation(clip);
 		}
 		
 		public function ChangeState(state:CharacterState)
@@ -117,12 +143,36 @@ package
 		}
 		public function ChangeAnimation(name:String, img:Class = null):void
 		{
+	
 			if(IsPlayingAnimation(name))
 				return;
-			
-			if(img != null)
+				
+			if (img != null)
 			{
 				loadGraphic(img,true,false,srcWH.x,srcWH.y);
+				mCurrentImg = img;
+			}
+			
+			if (mAnimations.containsClip(name))
+			{
+				if (mAnimations.containsClip(mCurrentAnimation))
+				{
+					var current:AnimationClip = mAnimations.getAnimation(mCurrentAnimation);
+					this.x -= current.origin.x;
+					this.y -= current.origin.y;
+				}
+				
+				var clip:AnimationClip = mAnimations.getAnimation(name);
+				if (clip.src != null)
+					loadGraphic(clip.src, true, false, clip.fw, clip.fh, false);
+					
+				else if (clip.fh != srcWH.y || clip.fw != srcWH.x)
+					loadGraphic(mCurrentImg, true, false, clip.fw, clip.fh, false);
+					
+				this.x += clip.origin.x;
+				this.y += clip.origin.y;
+				//	mCurrentAnimation = name;
+				//play(name);
 			}
 			
 			play(name);

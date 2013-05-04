@@ -273,7 +273,7 @@ package
 			for each(var sw:WallSwitch in mWallSwitches.members)
 			{
 				if(player.Attacking())
-					sw.onHit(player);
+					sw.onHit(player.WeaponHitBox());
 			}
 		}
 		

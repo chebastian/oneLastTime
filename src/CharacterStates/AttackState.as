@@ -2,6 +2,8 @@ package CharacterStates
 {
 	import flash.display.Sprite;
 	import flash.geom.Point;
+	import org.flixel.FlxG;
+	import org.flixel.FlxSprite;
 	/**
 	 * ...
 	 * @author ...
@@ -19,14 +21,17 @@ package CharacterStates
 			mCharacter.ChangeAnimation("idle", null);
 			
 			mId = ATTACK_STATE;
-			
-			mCharacter.ChangeAnimation("attack",null);
+				
 		}
 		
 		override public function OnEnter():void 
 		{
 			super.OnEnter();
-			mCharacter.ChangeAnimation("attack", null);
+			//mCharacter.ChangeAnimation("attack", null);
+			if(mCharacter.Heading().x < 0)
+				mCharacter.ChangeAnimation("attackL", null);
+			else if(mCharacter.Heading().x != 0)
+				mCharacter.ChangeAnimation("attackR", null);
 		}
 		
 		override public function OnExit():void 
