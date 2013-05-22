@@ -21,7 +21,7 @@ package
 		{
 			for (var i:uint = 0; i < mAnimations.length; i++)
 			{
-				if (mAnimations[i].name.toLocaleLowerCase == name.toLocaleLowerCase)
+				if (mAnimations[i].name == name)
 					return true;
 			}
 			
@@ -32,7 +32,7 @@ package
 		{
 			for (var i:uint = 0; i < mAnimations.length; i++)
 			{
-				if (mAnimations[i].name.toLocaleLowerCase == name.toLocaleLowerCase)
+				if (mAnimations[i].name == name)
 					return mAnimations[i];
 			}
 			

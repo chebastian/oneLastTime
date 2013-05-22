@@ -46,6 +46,8 @@ package
 		
 		public var PlayerCurrentItems:FlxGroup;
 		public var Keys:uint;
+		public static var TILE_WIDTH:int = 32;
+		public static var TILE_HEIGHT:int = 32;
 		
 		public function PlayState() 
 		{
@@ -68,7 +70,8 @@ package
 			
 			mCellLevel = new CellLevel(this);
 			//mCellLevel.LoadLevel("../media/levels/level_1/level_1.xml");
-			mCellLevel.LoadLevel("../media/levels/switchtest/switchtest.xml");
+			//mCellLevel.LoadLevel("../media/levels/switchtest/switchtest.xml");
+			mCellLevel.LoadLevel("../media/levels/portal_test001/portal_test001.xml");
 			//mCellLevel.LoadLevel("../media/levels/uno/uno.xml");
 			//mCellLevel.LoadLevel("../media/levels/aawallgo/aawallgo.xml");
 			//mCellLevel.LoadLevel("../media/levels/bkg/bkg.xml");
@@ -256,6 +259,15 @@ package
 		public function ActiveLevel():CellLevel
 		{
 			return mCellLevel;
+		}
+		
+		public function getTileWidth():int {
+			return TILE_WIDTH;
+		}
+		
+		public function getTileHeight():int
+		{
+			return TILE_HEIGHT;
 		}
 	}
 

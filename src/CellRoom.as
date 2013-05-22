@@ -37,6 +37,7 @@ package
 		var mWallSwitches:FlxGroup;
 		var mRaisableWalls:FlxGroup;
 		var mSolidObjects:FlxGroup;
+		var mPortals:FlxGroup;
 		
 		var mWallNotifier:WallNotifier;
 		
@@ -96,6 +97,7 @@ package
 			mWallNotifier = new WallNotifier(mGame,mGameObjects);
 			mWallSwitches = new FlxGroup();
 			mRaisableWalls = new FlxGroup();
+			mPortals = new FlxGroup();
 			mSolidObjects = new FlxGroup();
 			
 			mEmpty = path.toUpperCase == FILE_EMPTY_ROOM.toUpperCase;
@@ -223,6 +225,7 @@ package
 			FlxG.collide(mGroupEnemies, mMap);
 			
 			handlePlayerHitSwitch(mGame.ActivePlayer());
+			playerEnterPortal(mGame.ActivePlayer());
 			ProcessRoomGoals();
 		}
 		
@@ -274,6 +277,18 @@ package
 			{
 				if(player.Attacking())
 					sw.onHit(player.WeaponHitBox());
+			}
+		}
+		
+		public function playerEnterPortal(player:PlayerCharacter):void 
+		{
+			for each( var p:CellLevelPortal in mPortals.members) 
+			{
+				if (FlxG.collide(player, p) )
+				{
+					mGame.ActiveLevel().changeLevel(p);
+					return;
+				}
 			}
 		}
 		
@@ -607,6 +622,10 @@ package
 			mRaisableWalls.add(r);
 		}
 		
+		public function addCellLevelPortal(p:CellLevelPortal):void {
+			mPortals.add(p);
+		}
+		
 		public function setId(id:uint):void
 		{
 			mUniqueId = id;
@@ -630,6 +649,10 @@ package
 		public function reloadRoom():void {
 			this.ClearLevel();
 			this.OnEnter();
+		}
+		
+		public function getFilePath():String {
+			return mRoomFilePath;
 		}
 	}
 

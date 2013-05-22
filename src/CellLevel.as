@@ -252,10 +252,12 @@ package
 		{
 			var doors:XMLList = nodes.door;
 			var switches:XMLList = nodes.doorSwitch;
+			var portals:XMLList = nodes.portal;
 			
 			parseSwitches(switches, room);
 			parseDoors(doors, room);
 			parseGameObj(nodes, room, "doorSwitch");
+			parsePortals(portals, room);
 			//mGame.LAYER_ENEMY.add(mGameObjects);
 		
 		}
@@ -292,7 +294,7 @@ package
 					}
 				}
 				
-				var wall:RaisableWall = new RaisableWall(pos.x * 32, pos.y * 32);
+				var wall:RaisableWall = new RaisableWall(pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight());
 				wall.setOpen(open);
 				mGameObjects.add(wall);
 				//room.AddGameObjects(wall);
@@ -327,6 +329,38 @@ package
 				wallSwitch.setOpen(open);
 				//mGameObjects.add(wallSwitch);
 				room.addWallSwitch(wallSwitch);
+			}
+		}
+		
+		private function parsePortals(nodes:XMLList, room:CellRoom) 
+		{
+			for each (var node in nodes)
+			{
+				var pos:FlxPoint = new FlxPoint();
+				var level:String = new String();
+				for each (var attribute in node.attributes())
+				{
+					if (attribute.name() == "x")
+					{
+						pos.x = parseInt(attribute);
+					}
+					else if (attribute.name() == "y")
+					{
+						pos.y = parseInt(attribute);
+					}
+					else if (attribute.name() == "level")
+					{
+						level = attribute;
+					}
+				}
+				
+				var from:String = new String();
+				from = room.getFilePath();
+				var ent:CellLevelPortal = new CellLevelPortal(pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight(), from, level);
+				room.addCellLevelPortal(ent);
+				//mGameObjects.add(ent);
+				//room.AddGameObjects(wall);
+				//room.addRaisableWall(wall);
 			}
 		}
 		
@@ -516,11 +550,11 @@ package
 		}
 		
 		public function testreloadLevel():void {
-				testClearLevel();
+				clearLevel();
 				LoadLevel(mLevelFilePath);
 		}
 		
-		public function testClearLevel():void {
+		public function clearLevel():void {
 			mGame.LAYER_BKG.clear();
 			mGame.LAYER_BKG1.clear();
 			mGame.LAYER_ENEMY.clear();
@@ -562,6 +596,13 @@ package
 			var xmlList:XMLList = xmlData.data;
 			//var room = getRoomNodeFromXmlByName(xmlList, ActiveRoom().GetName());
 		}
+		
+		public function changeLevel(p:CellLevelPortal) 
+		{
+			clearLevel();
+			LoadLevel(p.getDestination());
+		}
+		
 	}
 
 }

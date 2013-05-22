@@ -8,8 +8,11 @@ package
 	 import CharacterStates.IdleState;
 	 import CharacterStates.WanderState;
 	 import flash.display.ShaderParameter;
+	 import flash.events.Event;
 	 import flash.events.ProgressEvent;
 	 import flash.geom.Point;
+	 import flash.net.URLLoader;
+	 import flash.net.URLRequest;
 	 import GameObject;
 	public class Character extends GameObject
 	{
@@ -47,6 +50,8 @@ package
 		var mHitBoxSizeOffset:Point;
 		var srcWH:Point;
 		
+		/*Loader for JSON*/
+		var mLoaderJSON:URLLoader;
 		
 		/*TEMP FOR ATTACKING*/
 		var mAnimations:AnimationBank;
@@ -97,9 +102,20 @@ package
 			
 			mCurrentAnimation = "";
 			ChangeAnimation(Animation_Idle, GameResources.Anim_LinkWalkDown);
-			
+		}
+		
+		public function loadAnimationFromJSON(path:String)
+		{	
+			mLoaderJSON = new URLLoader();
+			mLoaderJSON.addEventListener(Event.COMPLETE, onLoadedAnimations);
+			mLoaderJSON.load(new URLRequest(path));
+		}
+		
+		public function onLoadedAnimations(e:Event):void 
+		{
 			
 		}
+		
 		public function addClip(clip:AnimationClip)
 		{
 			mAnimations.addAnimation(clip);

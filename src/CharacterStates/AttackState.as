@@ -18,7 +18,7 @@ package CharacterStates
 			super(ATTACK_STATE, char);
 			
 			mAttackCountDown = 0.2;
-			mCharacter.ChangeAnimation("idle", null);
+			//mCharacter.ChangeAnimation("idle", null);
 			
 			mId = ATTACK_STATE;
 				
@@ -32,6 +32,9 @@ package CharacterStates
 				mCharacter.ChangeAnimation("attackL", null);
 			else if(mCharacter.Heading().x != 0)
 				mCharacter.ChangeAnimation("attackR", null);
+			
+			if (mCharacter.Heading().y == 1)
+				mCharacter.ChangeAnimation("attackD", null);
 		}
 		
 		override public function OnExit():void 

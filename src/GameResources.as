@@ -1,5 +1,6 @@
 package  
 {
+	import flash.utils.Dictionary;
 	/**
 	 * ...
 	 * @author Sebastian Ferngren
@@ -7,15 +8,65 @@ package
 	public class GameResources 
 	{
 		
+		var mImages:Dictionary;
+		
 		public function GameResources() 
 		{
-			
+			mImages = new Dictionary();
+			trace("INSTANCE CREATED");
+		}
+		
+		public function initResources():void
+		{
+			//
+		//New pirate char
+		//
+				[Embed(source = "../media/Player_sheet.png")]
+				var ps:Class;
+		
+				[Embed(source = "../media/player_attack.png")]
+				var pa:Class;
+				
+				[Embed(source = "../media/pirate/pirate_attackD.png")]
+				var pad:Class;
+				
+				[Embed(source = "../media/pirate/pirate_walkLR2.png")]
+				var newp:Class;
+					
+				[Embed(source = "../media/pirate/pirate_walkD22.png")]
+				var newp2:Class;
+				
+				[Embed(source = "../media/pirate/pirate_walkU2.png")]
+				var newp3:Class;
+				
+				[Embed(source = "../media/pirate/pirate_attackR.png")]
+				var newp4:Class;
+				
+				addResource("Pirate_attackR", newp4);
+				addResource("Pirate_walkLR", newp);
+				addResource("Pirate_walkD", newp2);
+				addResource("Pirate_walkU", newp3);
+				addResource("Player_AttackD", pad);
+				addResource("Player_Sheet", ps);
+				addResource("Player_Attack", pa);
+		}
+		
+		public function addResource(name:String, img:Class)
+		{
+			mImages[name] = img;
 		}
 		
 		public function getResource(name:String):Class
 		{
+			return mImages[name];
 		}
 		
+		[Embed(source = "../media/Player_sheet.png")]
+		public static var Player_Sheet:Class;
+		
+		[Embed(source = "../media/player_attack.png")]
+		public static var Player_Attack:Class;
+				
 		//
 		// Level Tiles
 		//
@@ -46,15 +97,6 @@ package
 		
 		[Embed(source = "../media/slash_32_32.png")]
 		public static var Anim_Attack:Class;
-		
-		//
-		//New pirate char
-		//
-		[Embed(source = "../media/Player_sheet.png")]
-		public static var Player_Sheet:Class;
-		
-		[Embed(source = "../media/player_attack.png")]
-		public static var Player_Attack:Class;
 		
 		
 		//
