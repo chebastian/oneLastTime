@@ -13,7 +13,7 @@ package
 		var mIdentifier:String;
 		var mRoom:CellRoom;
 		var mExitDir:Point;
-		
+		var Activated:Boolean;
 		public function CellLevelPortal(room:CellRoom,_x:Number, _y:Number,from:String, to:String,identifier:String) 
 		{
 			super(_x, _y, null);
@@ -26,7 +26,8 @@ package
 			solid = true;
 			mIdentifier = identifier;
 			mRoom = room;
-			mExitDir = new Point(0, 1);
+			mExitDir = new Point(1, 1);
+			Activated = false;
 		}
 		
 		public function getDestination():String
@@ -50,8 +51,10 @@ package
 		
 		public function passThroughPortal(p:PlayerCharacter):void
 		{
-			p.x += mExitDir.x * this.width;
-			p.y += mExitDir.y * this.height;
+			p.x = x;
+			p.y = y;
+			p.x += mExitDir.x * (p.width*2);
+			p.y += mExitDir.y * (p.height*2);
 		}
 		
 		public function onCompleteLoad():void

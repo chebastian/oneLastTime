@@ -32,9 +32,12 @@ package
 		var mLevelFilePath:String;
 		
 		var mGameObjects:FlxGroup;
+		var mPlayerSpawnPoint:Point;
+		var mRoomStartPoint:Point;
 		
 		private var mWorkingDir:String;
 		private var mLevelName:String;
+		public var LoadFinished:Boolean;
 		
 		public function CellLevel(game:PlayState)
 		{
@@ -49,6 +52,10 @@ package
 			mLevelName = "";
 			mGameObjects = new FlxGroup();
 			mSwitchState = false;
+			
+			mPlayerSpawnPoint = new Point(game.ActivePlayer().x, game.ActivePlayer().y);
+			mRoomStartPoint = new Point(0, 0);
+			LoadFinished = false;
 		}
 		
 		public function AddPickup(item:Pickup):void
@@ -126,10 +133,11 @@ package
 			
 			ParseLevelRooms(levelList);
 			
-			ChangeRoom(new Point(0, 0));
+			ChangeRoom(mRoomStartPoint);
 			mMiniMap = new MiniMap(this, 0, 0);
 			mMiniMap.GenerateMap();
-		
+			LoadFinished = true;
+			mGame.onEnterLevel();
 			//mGame.add(mMiniMap);
 		}
 		
@@ -408,7 +416,7 @@ package
 			return true;
 		}
 		
-		protected function ChangeRoom(index:Point):Boolean
+		public function ChangeRoom(index:Point):Boolean
 		{
 			var nextRoom:CellRoom = GetRoomAtIndex(index);
 			
@@ -615,14 +623,19 @@ package
 			mGame.switchToLevelThroughPortal(p);
 		}
 		
-		public function switchToLevel(p:CellLevelPortal) :void
+		public function switchToLevel(p:CellLevelPortal,func:Function) :void
 		{
 			clearLevel();
 			var xmlLoader:URLLoader = new URLLoader();
 			var xmlData:XML = new XML();
 			
-			xmlLoader.addEventListener(Event.COMPLETE, p.onCompleteLoad);
+			xmlLoader.addEventListener(Event.COMPLETE, func);
 			xmlLoader.load(new URLRequest(p.getDestination()));
+		}
+		
+		public function setPlayerSpawnPoint(p:Point)
+		{
+			mPlayerSpawnPoint = p;
 		}
 		
 	}

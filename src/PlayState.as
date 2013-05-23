@@ -36,6 +36,7 @@ package
 		
 		var mPlayer:PlayerCharacter;
 		var mSlime:EnemySlime;
+		var mActivePortal:CellLevelPortal;
 		
 		public var LAYER_BKG:FlxGroup;
 		public var LAYER_BKG1:FlxGroup;
@@ -272,7 +273,33 @@ package
 		
 		public function switchToLevelThroughPortal(p:CellLevelPortal)
 		{
+			//clearLevel();
+			//LoadLevel(p.getDestination()); //Add a callbackfunc to change position, room index and so on after load.
+			//ChangeRoom(new Point(p.getRoom().MapIndex().x, p.getRoom().MapIndex().y));
 			
+			//var destPortal:CellLevelPortal = ActiveRoom().getPortalFromId(p.getIdentifier());
+			
+			//mGame.ActivePlayer().setPosition(new Point(destPortal.x, destPortal.y));
+			//destPortal.passThroughPortal(mGame.ActivePlayer());
+			ActiveLevel().clearLevel();
+			
+			var newLevel:CellLevel = new CellLevel(this);
+			newLevel.LoadLevel(p.getDestination());
+			mCellLevel = newLevel;
+			mActivePortal = p;
+			mActivePortal.Activated = true;
+			//after level loads
+			//set spawn point from p
+		}
+		
+		public function onEnterLevel()
+		{
+			if (mActivePortal != null && mActivePortal.Activated)
+			{
+				var portalExit:CellLevelPortal =  mCellLevel.ActiveRoom().getPortalFromId(mActivePortal.getIdentifier());
+				portalExit.passThroughPortal(mPlayer);
+				
+			}
 		}
 	}
 
