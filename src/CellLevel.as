@@ -252,7 +252,7 @@ package
 		{
 			var doors:XMLList = nodes.door;
 			var switches:XMLList = nodes.doorSwitch;
-			var portals:XMLList = nodes.portal;
+			var portals:XMLList = nodes.levelLink;
 			
 			parseSwitches(switches, room);
 			parseDoors(doors, room);
@@ -337,7 +337,8 @@ package
 			for each (var node in nodes)
 			{
 				var pos:FlxPoint = new FlxPoint();
-				var level:String = new String();
+				var level:String = new String("not_set");
+				var id:String = new String("not_set");
 				for each (var attribute in node.attributes())
 				{
 					if (attribute.name() == "x")
@@ -352,11 +353,15 @@ package
 					{
 						level = attribute;
 					}
+					else if (attribute.name() == "id")
+					{
+						id = attribute;
+					}
 				}
 				
 				var from:String = new String();
 				from = room.getFilePath();
-				var ent:CellLevelPortal = new CellLevelPortal(pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight(), from, level);
+				var ent:CellLevelPortal = new CellLevelPortal(room,pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight(), from, level,id);
 				room.addCellLevelPortal(ent);
 				//mGameObjects.add(ent);
 				//room.AddGameObjects(wall);
@@ -599,8 +604,25 @@ package
 		
 		public function changeLevel(p:CellLevelPortal) 
 		{
+			//clearLevel();
+			//LoadLevel(p.getDestination()); //Add a callbackfunc to change position, room index and so on after load.
+			//ChangeRoom(new Point(p.getRoom().MapIndex().x, p.getRoom().MapIndex().y));
+			
+			//var destPortal:CellLevelPortal = ActiveRoom().getPortalFromId(p.getIdentifier());
+			
+			//mGame.ActivePlayer().setPosition(new Point(destPortal.x, destPortal.y));
+			//destPortal.passThroughPortal(mGame.ActivePlayer());
+			mGame.switchToLevelThroughPortal(p);
+		}
+		
+		public function switchToLevel(p:CellLevelPortal) :void
+		{
 			clearLevel();
-			LoadLevel(p.getDestination());
+			var xmlLoader:URLLoader = new URLLoader();
+			var xmlData:XML = new XML();
+			
+			xmlLoader.addEventListener(Event.COMPLETE, p.onCompleteLoad);
+			xmlLoader.load(new URLRequest(p.getDestination()));
 		}
 		
 	}

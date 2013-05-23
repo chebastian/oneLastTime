@@ -269,6 +269,11 @@ package
 		{
 			return TILE_HEIGHT;
 		}
+		
+		public function switchToLevelThroughPortal(p:CellLevelPortal)
+		{
+			
+		}
 	}
 
 }

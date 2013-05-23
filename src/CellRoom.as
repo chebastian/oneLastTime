@@ -654,6 +654,29 @@ package
 		public function getFilePath():String {
 			return mRoomFilePath;
 		}
+		
+		public function getPortalFromId(id:String):CellLevelPortal
+		{
+			for each(var p:CellLevelPortal in mPortals.members)
+			{
+				if (p.getIdentifier() == id)
+					return p;
+			}
+			return null;
+		}
+		
+		public function roomHasPortalId(id:String):Boolean
+		{
+			for each(var p:CellLevelPortal in mPortals.members)
+			{
+				if (p.getIdentifier() == id)
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
 	}
 
 }

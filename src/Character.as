@@ -338,6 +338,12 @@ package
 		{
 			return mStrength;
 		}
+		
+		public function setPosition(p:Point)
+		{
+			this.x = p.x;
+			this.y = p.y;
+		}
 	}
 
 }
