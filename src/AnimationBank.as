@@ -1,5 +1,6 @@
 package  
 {
+	import org.flixel.FlxSprite;
 	/**
 	 * ...
 	 * @author Sebastian Ferngren
@@ -7,8 +8,11 @@ package
 	public class AnimationBank 
 	{
 		var mAnimations:Array;
+		var Path:String;
+		
 		public function AnimationBank() 
 		{
+			Path = new String("Not Loaded");
 			mAnimations = new Array();
 		}
 		
@@ -37,6 +41,16 @@ package
 			}
 			
 			return null;
+		}
+		
+		
+		public function registerAnimationsToSprite(spr:FlxSprite)
+		{
+			for (var i:int = 0; i < mAnimations.length; i++)
+			{
+				var anim:AnimationClip = mAnimations[i];
+				spr.addAnimation(anim.name, anim.frames, anim.fps, anim.looped);
+			}
 		}
 		
 	}

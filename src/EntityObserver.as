@@ -13,7 +13,7 @@ package
 			mUniqueId = uniqueId;
 		}
 		
-		public function onNotify():void {
+		public virtual function onNotify():void {
 			
 		}
 		

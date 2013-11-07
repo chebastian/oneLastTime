@@ -23,7 +23,7 @@ package
 		var mWeaponReach:Number;
 		var mLoader:ExternalBitmap;
 		var mWalkAnim:FlxSprite;
-		
+		var animLoader:AnimationLoader;
 		public function PirateCharacter(game:PlayState, pos:Point) 
 		{
 			super(game, pos);
@@ -33,45 +33,30 @@ package
 			mWeaponReach = 5;
 			mWeaponHitbox = new GameObject(this.x, this.y, null);
 			mWeaponHitbox.width = 3;
-			mWeaponHitbox.height = 3;	
-		}
-		
-		public function onLoadedBitmap(e:ExternalBitmap)
-		{
-			mWalkAnim = new FlxSprite(0, 0, null);
-		}
+			mWeaponHitbox.height = 3;
+			mAnimationFrameRate = 2;
+		}		
 		
 		override public function InitAnimations():void 
 		{	
 			var resources:GameResources = new GameResources();
 			resources.initResources();
-			loadGraphic(resources.getResource("Player_Sheet"), true, true, 16, 16, false);
+			//loadGraphic(resources.getResource("Player_Sheet"), true, true, 16, 16, false);
 			mCurrentAnimation = "";
 			srcWH = new Point(24, 32);
+			animLoader = new AnimationLoader(mGame);
 			
-			/*var resources:GameResources = new GameResources();
-			resources.initResources();
-			loadGraphic(resources.getResource("Pirate_WalkLR"), true, true, 16, 16, false);
-			mCurrentAnimation = "";
-			srcWH = new Point(24, 32);*/
-			
-			
-		/*	this.addAnimationClip(Animation_Idle, [8], mAnimationFrameRate, srcWH.x, srcWH.y, true, resources.getResource("Player_Sheet"));
-			this.addAnimationClip(Animation_WalkRight, [0, 1, 2, 3], mAnimationFrameRate, srcWH.x, srcWH.y, true, resources.getResource("Player_Sheet"));
-			this.addAnimationClip(Animation_WalkLeft, [4, 5, 6, 7], mAnimationFrameRate, srcWH.x, srcWH.y, true, resources.getResource("Player_Sheet"));
-			this.addAnimationClip(Animation_WalkDown, [8, 9, 10], mAnimationFrameRate, srcWH.x, srcWH.y, true, resources.getResource("Player_Sheet"));
-			this.addAnimationClip(Animation_WalkUp, [11, 12, 13], mAnimationFrameRate, srcWH.x, srcWH.y, true, resources.getResource("Player_Sheet"));
-			this.addAnimationClip(Animation_Attack_R, [0, 1, 0], mAnimationFrameRate, 24, srcWH.y, true, resources.getResource("Player_Attack"));
-			
-			var attackLeft:AnimationClip = new AnimationClip(Animation_Attack_L, [2, 3, 2], 24, srcWH.y, resources.getResource("Player_Attack"));
-			attackLeft.fps = mAnimationFrameRate;
-			attackLeft.origin.x = -8;
-			attackLeft.origin.y = 0;
-			this.addClip(attackLeft);*/
-			
-			//loadAnimationFromJSON("../media/pirate/animations.txt");
-			loadAnimationFromJSON("../media/pirate/character_anim.txt");
-			
+			animLoader.loadBankFromFile("../media/pirate/character_anim.txt");
+			animLoader.addEventListener(Event.COMPLETE, testOnComplete);
+			ChangeAnimation(Animation_WalkDown, resources.getResource("Pirate_walkD"));
+		}
+		
+		public function testOnComplete(e:Event):void 
+		{
+			{
+				mAnimations = animLoader.getAnimationBank();
+				mAnimations.registerAnimationsToSprite(this);
+			}
 		}
 		
 		override public function onLoadedAnimations(e:Event):void 
@@ -147,7 +132,7 @@ package
 		}
 		override public function HandleInput():void 
 		{
-			var speed:Number = 100.0;
+			var speed:Number = WALK_SPEED;
 		
 				
 			if (IsInState(CharacterState.ATTACK_STATE) || IsInState(CharacterState.DAMAGED_STATE) )

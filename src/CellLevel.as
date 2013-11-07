@@ -13,6 +13,7 @@ package
 	import flash.xml.XMLNode;
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxPoint;
+	import RoomAssets.*;
 	
 	/**
 	 * ...
@@ -261,11 +262,14 @@ package
 			var doors:XMLList = nodes.door;
 			var switches:XMLList = nodes.doorSwitch;
 			var portals:XMLList = nodes.levelLink;
+			var blockers:XMLList = nodes.blocker;
 			
 			parseSwitches(switches, room);
 			parseDoors(doors, room);
+			parseBlockers(blockers, room);
 			parseGameObj(nodes, room, "doorSwitch");
 			parsePortals(portals, room);
+			
 			//mGame.LAYER_ENEMY.add(mGameObjects);
 		
 		}
@@ -303,6 +307,8 @@ package
 				}
 				
 				var wall:RaisableWall = new RaisableWall(pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight());
+					if (!open)
+						wall = new RaisableWallOpposite(pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight());
 				wall.setOpen(open);
 				mGameObjects.add(wall);
 				//room.AddGameObjects(wall);
@@ -338,6 +344,28 @@ package
 				//mGameObjects.add(wallSwitch);
 				room.addWallSwitch(wallSwitch);
 			}
+		}
+		
+		private function parseBlockers(nodes:XMLList, room:CellRoom):void
+		{
+			for each(var node in nodes)
+			{
+				var blocker:BlockerWall = new BlockerWall(0, 0);
+				blocker.x = mGame.getTileWidth() * getIntAttribute("x", node);
+				blocker.y = mGame.getTileHeight() * getIntAttribute("y", node);
+				room.addBlockerWall(blocker);
+			}
+		}
+		
+		private function getIntAttribute(name:String, node:XML)
+		{
+			for each(var attr in node.attributes())
+			{
+				if (attr.name() == name)
+					return parseInt(attr);
+			}
+			
+			return 0;
 		}
 		
 		private function parsePortals(nodes:XMLList, room:CellRoom) 

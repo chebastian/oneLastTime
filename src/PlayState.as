@@ -31,7 +31,7 @@ package
 		//protected var mLevel:CellRoom;
 		protected var mDoneLoadingString:String;
 		protected var mCellLevel:CellLevel;
-		var mTransEffect:TransitionEffect;
+		//var mTransEffect:TransitionEffect;
 		var mCamera:FlxCamera;
 		
 		var mPlayer:PlayerCharacter;
@@ -52,30 +52,24 @@ package
 		
 		public function PlayState() 
 		{
-			FlxG.debug = true;
+			FlxG.debug = false;
 			super();
-			
-			testCamera();
+			//testCamera();
 			CreateLayers();
 			LAYER_BKG.add(new FlxText(0, 0, 100, "PLAYSTATE"));
 			
 			mDoneLoadingString = "NOT DONE LOADING";
 			
-			mTransEffect = new TransitionEffect(this);
-			mTransEffect.init(20, 20, 5);
-			mTransEffect.addEventListener("Fade Complete", FadeComplete);
+			//mTransEffect = new TransitionEffect(this);
+			//mTransEffect.init(20, 20, 5);
+			//mTransEffect.addEventListener("Fade Complete", FadeComplete);
 			mPlayer = new PirateCharacter(this, new Point(300, 200));
 			PlayerCurrentItems = new FlxGroup();
 			
 			LAYER_MID.add(mPlayer);
 			
 			mCellLevel = new CellLevel(this);
-			//mCellLevel.LoadLevel("../media/levels/level_1/level_1.xml");
-			//mCellLevel.LoadLevel("../media/levels/switchtest/switchtest.xml");
-			mCellLevel.LoadLevel("../media/levels/portal_test001/portal_test001.xml");
-			//mCellLevel.LoadLevel("../media/levels/uno/uno.xml");
-			//mCellLevel.LoadLevel("../media/levels/aawallgo/aawallgo.xml");
-			//mCellLevel.LoadLevel("../media/levels/bkg/bkg.xml");
+			mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
 		}
 		
 		public function testCamera():void {

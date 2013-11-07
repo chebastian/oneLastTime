@@ -39,7 +39,7 @@ package
 		
 		public function HandleInput():void
 		{
-			var speed:Number = 100.0;
+			var speed:Number = WALK_SPEED;
 			
 			if (FlxG.keys.justPressed("A") && !IsInState(CharacterState.ATTACK_STATE))
 				ChangeState(new AttackState(this));

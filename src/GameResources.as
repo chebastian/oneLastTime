@@ -39,16 +39,28 @@ package
 				[Embed(source = "../media/pirate/pirate_walkU2.png")]
 				var newp3:Class;
 				
-				[Embed(source = "../media/pirate/pirate_attackR.png")]
+				[Embed(source = "../media/pirate/pirate_stabLR.png")]
 				var newp4:Class;
 				
+				[Embed(source = "../media/pirate/pirate_attackU2.png")]
+				var newp5:Class;
+				
+				[Embed(source = "../media/pirate/pirate_attackD2_effect.png")]
+				var newp6:Class;
+				
+				addResource("Pirate_AttackD", newp6);
 				addResource("Pirate_attackR", newp4);
 				addResource("Pirate_walkLR", newp);
 				addResource("Pirate_walkD", newp2);
 				addResource("Pirate_walkU", newp3);
-				addResource("Player_AttackD", pad);
+				addResource("Pirate_AttackU", newp5);
 				addResource("Player_Sheet", ps);
 				addResource("Player_Attack", pa);
+				
+				/*Add Skeleton Resources*/
+				[Embed(source = "../media/skeleton/walk_LR.png")]
+				var skeleton_anim:Class;
+				addResource("Skeleton_walkLR", skeleton_anim);
 		}
 		
 		public function addResource(name:String, img:Class)

@@ -35,6 +35,9 @@ package CharacterStates
 			
 			if (mCharacter.Heading().y == 1)
 				mCharacter.ChangeAnimation("attackD", null);
+				
+			else if (mCharacter.Heading().y < 0)
+				mCharacter.ChangeAnimation("attackU", null);
 		}
 		
 		override public function OnExit():void 
@@ -46,7 +49,7 @@ package CharacterStates
 		{
 			super.OnUpdate();
 			mCharacter.StopMoving();
-			if (mStateTimer >= mAttackCountDown)
+			if (mCharacter.finished)
 			{
 				mCharacter.ChangeState(new IdleState(0, mCharacter));
 			}

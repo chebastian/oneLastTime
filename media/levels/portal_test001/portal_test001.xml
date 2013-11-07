@@ -8,7 +8,7 @@
 <door open="false" x="2" y="3"/>
 <door open="false" x="8" y="8"/>
 <door open="false" x="8" y="8"/>
-<levelLink id="area0" level="../media/levels/portal_test002/portal_test002.xml" open="false" x="1" y="0"/>
+<levelLink id="area0" level="../media/levels/portal_test003/portal_test003.xml" open="false" x="1" y="0"/>
 </gameObjects>
 </room>
 <room file="Room11111111.xml" id="1" indexX="1" indexY="2" name="Room11111111">

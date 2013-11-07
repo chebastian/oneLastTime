@@ -4,7 +4,7 @@
 		{
 			"img":"Player_Sheet",
 			"src":"../media/Player_sheet.png",
-			"fps":"10",
+			"fps":"20",
 			"fw":"16",
 			"fh":"16",
 			"looped":"true",

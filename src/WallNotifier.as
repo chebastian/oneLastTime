@@ -3,6 +3,7 @@ package
 	import org.flixel.FlxG;
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxU;
+	import RoomAssets.RaisableWall;
 	/**
 	 * ...
 	 * @author Sebastian Ferngren
@@ -28,9 +29,11 @@ package
 			
 			if (timeSinceLast >= mTimeBetweenNotifications)
 			{
+				mGame.ActiveLevel().setGlobalSwitchState(!mGame.ActiveLevel().getGlobalSwitchState());
 				for each(var wall:RaisableWall in mWalls.members)
 				{
-					mGame.ActiveLevel().setGlobalSwitchState(wall.toggleOpenClosed());
+					//mGame.ActiveLevel().setGlobalSwitchState(wall.toggleOpenClosed());
+					wall.toggleOpenClosed();
 				}
 			}
 			super.notify();

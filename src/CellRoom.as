@@ -18,8 +18,8 @@ package
 	import Cell;
 	import LevelDoor;
 	import Pickup;
-	import Door;
 	import org.flixel.FlxGroup;
+	import RoomAssets.*;
 	
 	/**
 	 * ...
@@ -38,6 +38,7 @@ package
 		var mRaisableWalls:FlxGroup;
 		var mSolidObjects:FlxGroup;
 		var mPortals:FlxGroup;
+		var mWallBlockers:FlxGroup;
 		
 		var mWallNotifier:WallNotifier;
 		
@@ -68,8 +69,8 @@ package
 		
 		public static var 	LEVEL_TILE_W = 32;
 		public static var 	LEVEL_TILE_H = 32;
-		public static var 	LEVEL_TILE_NUMX = 17;
-		public static var 	LEVEL_TILE_NUMY = 13;
+		public static var 	LEVEL_TILE_NUMX = 15;
+		public static var 	LEVEL_TILE_NUMY = 10;
 		protected var 		LEVEL_LEFT = 0;
 		protected var 		LEVEL_RIGHT = 32 + (LEVEL_TILE_W* LEVEL_TILE_NUMX);
 		protected var 		LEVEL_TOP = 0;
@@ -97,6 +98,7 @@ package
 			mWallNotifier = new WallNotifier(mGame,mGameObjects);
 			mWallSwitches = new FlxGroup();
 			mRaisableWalls = new FlxGroup();
+			mWallBlockers = new FlxGroup();
 			mPortals = new FlxGroup();
 			mSolidObjects = new FlxGroup();
 			
@@ -116,12 +118,14 @@ package
 			mGame.LAYER_ENEMY.add(mGameObjects);
 			mGame.LAYER_ITEM.add(mRaisableWalls);
 			mGame.LAYER_ITEM.add(mWallSwitches);
+			mGame.LAYER_ITEM.add(mWallBlockers);
 			
 			mGame.LAYER_ITEM.add(mPickups);
 			bindSwitches();
 			
 			mSolidObjects.add(mRaisableWalls);
 			mSolidObjects.add(mWallSwitches);
+			mSolidObjects.add(mWallBlockers);
 			//mMap.AddLayersToStage(mGame);
 		}
 		
@@ -231,6 +235,9 @@ package
 		
 		protected function ProcessRoomGoals():void
 		{
+			if (mGroupEnemies.length <= 0)
+				SetEventStatus(EVT_ENEMY_CLEARED, true);
+				
 			if (EventIsCleared(EVT_ENEMY_CLEARED) == false && EventIsCleared(EVT_ROOM_CLEARED) == false)
 			{
 				if (mGroupEnemies.countDead() >= mGroupEnemies.length)
@@ -238,6 +245,14 @@ package
 					SetEventStatus(EVT_ENEMY_CLEARED, true);
 					OnEnemiesCleared();
 				}
+			}
+			if(EventIsCleared(EVT_ENEMY_CLEARED) && mGroupEnemies.length > 0){
+				
+				for each(var w in mWallBlockers.members)
+				{
+					w.setOpen(true);
+				}
+				
 			}
 		}
 		
@@ -251,6 +266,8 @@ package
 				mPickups.members[i].Activate();
 				mGame.LAYER_ITEM.add(mPickups.members[i]);
 			}
+			
+			
 		}
 		
 		public function HandlePlayerEnemyCollision(player:PlayerCharacter):void
@@ -316,7 +333,7 @@ package
 			}
 			else if (bound == BOUNDS_LEFT)
 			{
-				player.x = LEVEL_RIGHT - LEVEL_BUFFER_W;
+				player.x = LEVEL_RIGHT;
 			}
 			else if (bound == BOUNDS_UP)
 			{
@@ -324,7 +341,7 @@ package
 			}
 			else if (bound == BOUNDS_DOWN)
 			{
-				player.y = LEVEL_TOP;
+				player.y = LEVEL_TOP + LEVEL_BUFFER_H*3;
 			}
 		}
 		
@@ -495,16 +512,17 @@ package
 						enemyType = attribute;
 					}
 					
-					else if (attribute.name() == "posX")
+					else if (attribute.name() == "x")
 					{
-						enemyPos.x = parseInt(attribute);
+						enemyPos.x = parseInt(attribute) * mGame.getTileWidth();
 					}
-					else if (attribute.name() == "posY")
+					else if (attribute.name() == "y")
 					{
-						enemyPos.y = parseInt(attribute);
+						enemyPos.y = parseInt(attribute) * mGame.getTileHeight();
 					}
 				}
 				
+				SetEventStatus(EVT_ENEMY_CLEARED, false);
 				var createdEnemy:EnemySlime = new EnemySlime(mGame, enemyPos);
 				mGame.LAYER_ENEMY.add(createdEnemy);
 				
@@ -620,6 +638,10 @@ package
 		
 		public function addRaisableWall(r:RaisableWall):void {
 			mRaisableWalls.add(r);
+		}
+		
+		public function addBlockerWall(r:BlockerWall):void {
+			mWallBlockers.add(r);
 		}
 		
 		public function addCellLevelPortal(p:CellLevelPortal):void {

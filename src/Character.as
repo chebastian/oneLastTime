@@ -90,7 +90,7 @@ package
 			mHitBoxSizeOffset = new Point(0, 0);
 		}
 		
-		public function InitAnimations():void
+		public virtual function InitAnimations():void
 		{
 			loadGraphic(GameResources.Anim_LinkWalkDown, true, false, srcWH.x, srcWH.y, false);
 			addAnimation(Animation_Idle,[0],mAnimationFrameRate);
