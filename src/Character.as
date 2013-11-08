@@ -5,6 +5,7 @@ package
 	 * @author Sebastian Ferngren
 	 */
 	
+	 import AttackReactions.ReactionManager;
 	 import CharacterStates.IdleState;
 	 import CharacterStates.WanderState;
 	 import flash.display.ShaderParameter;
@@ -34,9 +35,9 @@ package
 		public var mGame:PlayState;
 		var mWandering:Boolean;
 		var mHeading:Point;
-		var mIsAttacking:Boolean;
+		protected var mIsAttacking:Boolean;
 		
-		var mState:CharacterState;
+		protected var mState:CharacterState;
 		var mAnimationFrameRate:uint;
 		
 		var mHitCharCooldown:Number;
@@ -57,6 +58,9 @@ package
 		var mAnimations:AnimationBank;
 		var mCurrentImg:Class;
 		
+		/*Char attackreacktion*/
+		protected var mReactions:ReactionManager;
+		
 		public function Character(game:PlayState, _x:Number, _y:Number) 
 		{
 			mGame = game;
@@ -74,6 +78,7 @@ package
 			mAnimationFrameRate = 10;
 			srcWH = new Point(32, 32);
 			mAnimations = new AnimationBank();
+			mReactions = new ReactionManager(this);
 			Init();
 		}
 		
@@ -269,7 +274,7 @@ package
 		{
 			if (char.Attacking())
 			{
-				
+				mReactions.getReaction().onAttacked();
 			}
 		}
 		
@@ -343,6 +348,11 @@ package
 		{
 			this.x = p.x;
 			this.y = p.y;
+		}
+		
+		public function getReactionMgr():ReactionManager
+		{
+			return mReactions;
 		}
 	}
 

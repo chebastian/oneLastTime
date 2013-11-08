@@ -115,7 +115,7 @@
 			"src":"../media/pirate/pirate_attackD2_effect.png",
 			"fw":"24",
 			"fh":"32",
-			"fps":"10",
+			"fps":"15",
 			"looped":"true",
 
 			"clips":

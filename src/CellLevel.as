@@ -118,6 +118,7 @@ package
 			
 			xmlLoader.addEventListener(Event.COMPLETE, OnLoadLevel);
 			xmlLoader.load(new URLRequest(path));
+			
 			return true;
 		}
 		

@@ -1,5 +1,7 @@
 package  RoomAssets
 {
+	import AttackReactions.SwitchReaction;
+	import CharacterStates.SleepState;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
 	import flash.utils.Timer;
@@ -15,6 +17,8 @@ package  RoomAssets
 		//protected var mNotifier:WallNotifier;
 		protected var mCoolDown:Number;
 		protected var mLastSwitch:Number;
+		protected var mLastHitTime:Number;
+		protected var mMinHitDiff:Number = 0.3;
 		
 		public function WallSwitch(game:PlayState, _x:Number, _y:Number) 
 		{
@@ -22,6 +26,7 @@ package  RoomAssets
 			Init();
 			immovable = true;
 			solid = true;
+			mReactions.setReaction(new SwitchReaction(this));
 		}
 		
 		override public function Init():void 
@@ -82,14 +87,12 @@ package  RoomAssets
 			return mIsOpen;
 		}
 		
-		public function onHit(obj:GameObject) {
-			/*var len:Number = distanceBetween(obj);
-			if (len < this.width + obj.width)
-			{
-				toggleOpen();
-			}*/
+		public function onHit(obj:GameObject) 
+		{
 			if (obj.overlaps(this))
-				toggleOpen();
+			{
+				mReactions.getReaction().onAttacked();
+			}
 		}
 		
 	}

@@ -42,6 +42,10 @@ package
 			
 		}
 		
+		public virtual function onHit(obj:GameObject)
+		{
+		}
+		
 	}
 
 }

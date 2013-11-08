@@ -52,8 +52,14 @@ package
 		
 		public function PlayState() 
 		{
-			FlxG.debug = false;
 			super();
+		}
+		
+		override public function create():void 
+		{
+			super.create();
+			
+			FlxG.debug = false;
 			//testCamera();
 			CreateLayers();
 			LAYER_BKG.add(new FlxText(0, 0, 100, "PLAYSTATE"));
@@ -64,10 +70,11 @@ package
 			//mTransEffect.init(20, 20, 5);
 			//mTransEffect.addEventListener("Fade Complete", FadeComplete);
 			mPlayer = new PirateCharacter(this, new Point(300, 200));
+			mPlayer.Init();
+			mPlayer.InitAnimations();
 			PlayerCurrentItems = new FlxGroup();
 			
 			LAYER_MID.add(mPlayer);
-			
 			mCellLevel = new CellLevel(this);
 			mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
 		}
@@ -170,7 +177,7 @@ package
 			HandleEnemyCollision();
 			HandleDebugInput();
 			mCellLevel.update();
-			testUpdateCam();
+			//testUpdateCam();
 			
 		}
 		
