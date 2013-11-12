@@ -74,9 +74,10 @@ package
 			mPlayer.InitAnimations();
 			PlayerCurrentItems = new FlxGroup();
 			
-			LAYER_MID.add(mPlayer);
+			LAYER_ENEMY.add(mPlayer);
 			mCellLevel = new CellLevel(this);
-			mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
+			//mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
+			mCellLevel.LoadLevel("../media/levels/tt/tt.xml");
 		}
 		
 		public function testCamera():void {

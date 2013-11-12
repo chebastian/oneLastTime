@@ -27,15 +27,31 @@ package
 		public function PirateCharacter(game:PlayState, pos:Point) 
 		{
 			super(game, pos);
-			srcWH = new Point(16, 16);
-			mAABBOffset = new Point(0, 36);
-			mAABBHeightOffset = -16;
+		}		
+		
+		override public function Init():void 
+		{
+			super.Init();
+			mHitBox = new GameObject(this.x, this.y, null);
+			srcWH = new Point(8, 12);
+			scale.x = 4;
+			scale.y = 4;
+			
+			mAABBOffset = new Point(-10, 6);
+			mAABBHeightOffset = 12;
+			mAABBWidthOffset = 15;
+			
+			mHitBoxSizeOffset = new Point(0, 0);
+			mHitBoxPosOffset = new Point(0, 0);
+			mHitBox.width = width * this.scale.y;
+			mHitBox.height= this.height * this.scale.y;
+			
 			mWeaponReach = 5;
 			mWeaponHitbox = new GameObject(this.x, this.y, null);
 			mWeaponHitbox.width = 3;
 			mWeaponHitbox.height = 3;
 			mAnimationFrameRate = 2;
-		}		
+		}
 		
 		override public function InitAnimations():void 
 		{	
@@ -43,12 +59,12 @@ package
 			resources.initResources();
 			//loadGraphic(resources.getResource("Player_Sheet"), true, true, 16, 16, false);
 			mCurrentAnimation = "";
-			srcWH = new Point(24, 32);
+			srcWH = new Point(8, 12);
 			animLoader = new AnimationLoader(mGame);
 			
-			animLoader.loadBankFromFile("../media/pirate/character_anim.txt");
+			animLoader.loadBankFromFile("../media/player/player_anim.txt");
 			animLoader.addEventListener(Event.COMPLETE, testOnComplete);
-			ChangeAnimation(Animation_WalkDown, resources.getResource("Pirate_walkD"));
+			ChangeAnimation(Animation_WalkDown, resources.getResource("playerWalkDown"));
 		}
 		
 		public function testOnComplete(e:Event):void 
@@ -125,11 +141,19 @@ package
 			this.mWeaponHitbox.y = this.y + (mHeading.y * this.mWeaponReach);
 		}
 		
+		override public function UpdateHitbox():void 
+		{
+			super.UpdateHitbox();
+		}
+		
 		override public function draw():void 
 		{
 			super.draw();
+			//this.mHitBox.draw();
 			//this.mWeaponHitbox.draw();
+			//drawDebug(null);
 		}
+		
 		override public function HandleInput():void 
 		{
 			var speed:Number = WALK_SPEED;

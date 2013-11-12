@@ -57,10 +57,38 @@ package
 				addResource("Player_Sheet", ps);
 				addResource("Player_Attack", pa);
 				
+				[]//ADD RESOURCES FOR ANIMs
+				
 				/*Add Skeleton Resources*/
 				[Embed(source = "../media/skeleton/walk_LR.png")]
 				var skeleton_anim:Class;
 				addResource("Skeleton_walkLR", skeleton_anim);
+				
+				addPlayerResources();
+		}
+		
+		private function addPlayerResources():void
+		{
+			[Embed(source = "../media/player/walkLeft.png")]
+			var walkLeft:Class;
+			
+			[Embed(source = "../media/player/walkRight.png")]
+			var walkRight:Class;
+			
+			[Embed(source = "../media/player/walkUp.png")]
+			var walkUp:Class;
+			
+			[Embed(source = "../media/player/walkDown.png")]
+			var walkDown:Class;
+			
+			[Embed(source = "../media/player/bullet/bullet.png")]
+			var bullet:Class;
+			
+			addResource("playerWalkLeft", walkLeft);
+			addResource("playerWalkRight", walkRight);
+			addResource("playerWalkUp", walkUp);
+			addResource("playerWalkDown", walkDown);
+			addResource("bullet", bullet);
 		}
 		
 		public function addResource(name:String, img:Class)
@@ -136,7 +164,7 @@ package
 		public static var Tile_Locked:Class;
 		
 		//[Embed(source = "../media/rouge_tiles.png")]
-		[Embed(source = "../media/rouge_alpha2.png")]
+		[Embed(source = "../media/simpleTiles.png")]
 		public static var Map_Tile_2:Class;
 		
 		

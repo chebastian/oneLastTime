@@ -1,5 +1,7 @@
 package  
 {
+	import AttackReactions.DamageReaction;
+	import AttackReactions.KnockbackReaction;
 	import CharacterStates.DamagedState;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
@@ -39,6 +41,10 @@ package
 			addAnimation("damaged", [0, 1, 2, 3], mAnimationFrameRate);
 			addAnimation("death", [0, 1, 2, 3], mAnimationFrameRate);
 			ChangeAnimation("walkUp");
+			
+			
+			mReactions.setReaction(new DamageReaction(this, 50));
+			//mReactions.setReaction(new DamageReaction(this, 50));
 		}
 		
 		function AddSlimeTrail()
@@ -72,7 +78,7 @@ package
 					{
 						super.OnHitCharacter(char);
 						ChangeState(new DamagedState(this));
-						mHealth -= 50;
+						mReactions.getReaction().onAttacked();
 					}
 				}
 			}

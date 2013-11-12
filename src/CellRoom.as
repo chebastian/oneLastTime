@@ -113,6 +113,7 @@ package
 		
 		override public function  OnEnter():void
 		{
+			mGameObjects.add(mGame.ActivePlayer());
 			LoadLevel(mRoomFilePath);
 			SetRoomGoals();
 			mGame.LAYER_ENEMY.add(mGameObjects);
@@ -126,6 +127,7 @@ package
 			mSolidObjects.add(mRaisableWalls);
 			mSolidObjects.add(mWallSwitches);
 			mSolidObjects.add(mWallBlockers);
+			mGameObjects.sort();
 			//mMap.AddLayersToStage(mGame);
 		}
 		
@@ -224,6 +226,8 @@ package
 		
 		override public function update():void 
 		{
+			
+			mGameObjects.sort();
 			super.update();
 			
 			FlxG.collide(mGroupEnemies, mMap);
@@ -524,8 +528,8 @@ package
 				
 				SetEventStatus(EVT_ENEMY_CLEARED, false);
 				var createdEnemy:EnemySlime = new EnemySlime(mGame, enemyPos);
-				mGame.LAYER_ENEMY.add(createdEnemy);
-				
+				//mGame.LAYER_ENEMY.add(createdEnemy);
+				mGameObjects.add(createdEnemy);
 				mGroupEnemies.add(createdEnemy);
 			}
 		}

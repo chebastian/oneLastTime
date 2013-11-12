@@ -34,8 +34,9 @@ package
 		var WALK_SPEED:uint = 150;
 		public var mGame:PlayState;
 		var mWandering:Boolean;
-		var mHeading:Point;
+		protected var mHeading:Point;
 		protected var mIsAttacking:Boolean;
+		protected var mLookAt:Point;
 		
 		protected var mState:CharacterState;
 		var mAnimationFrameRate:uint;
@@ -69,7 +70,7 @@ package
 			super(_x, _y, null);
 			mAABBOffset = new Point(0, 16);
 			mAABBHeightOffset = -16;
-			
+			mLookAt = new Point(0, 0);	
 			maxVelocity.y = WALK_SPEED;
 			maxVelocity.x = WALK_SPEED;
 			mWandering = false;
@@ -176,12 +177,13 @@ package
 			
 			if (mAnimations.containsClip(name))
 			{
-				if (mAnimations.containsClip(mCurrentAnimation))
+				revertAnimationTransformations();
+				/*if (mAnimations.containsClip(mCurrentAnimation))
 				{
 					var current:AnimationClip = mAnimations.getAnimation(mCurrentAnimation);
 					this.x -= current.origin.x;
 					this.y -= current.origin.y;
-				}
+				}*/
 				
 				var clip:AnimationClip = mAnimations.getAnimation(name);
 				if (clip.src != null)
@@ -200,6 +202,16 @@ package
 			mCurrentAnimation = name;
 		}
 		
+		public function revertAnimationTransformations():void
+		{
+			if (mAnimations.containsClip(mCurrentAnimation))
+				{
+					var current:AnimationClip = mAnimations.getAnimation(mCurrentAnimation);
+					this.x -= current.origin.x;
+					this.y -= current.origin.y;
+				}
+		}
+		
 		public function IsPlayingAnimation(name:String):Boolean
 		{
 			if(mCurrentAnimation.toLocaleLowerCase() == name.toLocaleLowerCase())
@@ -213,6 +225,7 @@ package
 			super.update();
 			mState.OnUpdate();
 			UpdateHitbox();
+			updateLookAt();
 		}
 		
 		public function UpdateHitbox():void 
@@ -222,8 +235,8 @@ package
 			//
 			mHitBox.x = x + mHitBoxPosOffset.x;
 			mHitBox.y = y + mHitBoxPosOffset.y;
-			mHitBox.width = width + mHitBoxSizeOffset.x;
-			mHitBox.height = height + mHitBoxSizeOffset.y;
+			mHitBox.width = (width*this.scale.x) + mHitBoxSizeOffset.x;
+			mHitBox.height = (height*this.scale.y) + mHitBoxSizeOffset.y;
 			
 			//Update players attackHitBox, used for dealing damage
 			//this box will be moved around depending on players heading
@@ -232,6 +245,14 @@ package
 			mWeaponHitbox.y = y + mHeading.y * hitDist;
 			mWeaponHitbox.width = width;
 			mWeaponHitbox.height = height;
+		}
+		
+		protected function updateLookAt():void
+		{
+			if (mHeading.x != 0 && mHeading.y != 0)
+			{
+				mLookAt = mHeading;
+			}
 		}
 		
 		public function TurnRight()
@@ -353,6 +374,31 @@ package
 		public function getReactionMgr():ReactionManager
 		{
 			return mReactions;
+		}
+		
+		public function decreaseHeltah(num:Number):void
+		{
+			mHealth -= num;
+		}
+		
+		public function setHealth(num:Number):void
+		{
+			mHealth = num;
+		}
+		
+		public function getHealth():Number
+		{
+			return mHealth;
+		}
+		
+		public function getLookAt():Point
+		{
+			return mLookAt;
+		}
+		
+		public function getDirectionToPlayer():Point
+		{
+			return Directions[ DirectionBetween(mGame.ActivePlayer()) ];
 		}
 	}
 

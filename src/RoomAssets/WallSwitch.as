@@ -43,8 +43,8 @@ package  RoomAssets
 		{
 			super.InitAnimations();
 			loadGraphic(GameResources.WallSwitch, true, false, 32, 32, false);
-			addAnimation("open", [0],0,false);
-			addAnimation("closed", [1], 0, false);
+			addAnimation("open", [0,1,2,3],10,false);
+			addAnimation("closed", [4,5,6,7], 10, false);
 			play("open");
 		}
 		
