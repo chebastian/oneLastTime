@@ -50,6 +50,10 @@ package
 		public static var TILE_WIDTH:int = 32;
 		public static var TILE_HEIGHT:int = 32;
 		
+		
+		private var mBulletMgr:BulletManager;
+		private var mBulletTest:BulletTest;
+		
 		public function PlayState() 
 		{
 			super();
@@ -78,6 +82,9 @@ package
 			mCellLevel = new CellLevel(this);
 			//mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
 			mCellLevel.LoadLevel("../media/levels/tt/tt.xml");
+			
+			mBulletMgr = new BulletManager(this);
+			mBulletTest = new BulletTest(this);
 		}
 		
 		public function testCamera():void {
@@ -178,6 +185,9 @@ package
 			HandleEnemyCollision();
 			HandleDebugInput();
 			mCellLevel.update();
+			
+			mBulletTest.handleInput();
+			mBulletTest.testUpdate();
 			//testUpdateCam();
 			
 		}
@@ -302,6 +312,11 @@ package
 				portalExit.passThroughPortal(mPlayer);
 				
 			}
+		}
+		
+		public function getBulletMgr():BulletManager
+		{
+			return mBulletMgr;
 		}
 	}
 

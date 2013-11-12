@@ -9,11 +9,13 @@ package
 	{
 		var mAnimations:Array;
 		var Path:String;
+		private var LoadComplete:Boolean;
 		
 		public function AnimationBank() 
 		{
 			Path = new String("Not Loaded");
 			mAnimations = new Array();
+			LoadComplete = false;
 		}
 		
 		public function addAnimation(clip:AnimationClip)
@@ -51,6 +53,13 @@ package
 				var anim:AnimationClip = mAnimations[i];
 				spr.addAnimation(anim.name, anim.frames, anim.fps, anim.looped);
 			}
+			
+			LoadComplete = true;
+		}
+		
+		public function isFinishedLoading():Boolean
+		{
+			return LoadComplete;
 		}
 		
 	}

@@ -65,6 +65,12 @@ package
 		public function Character(game:PlayState, _x:Number, _y:Number) 
 		{
 			mGame = game;
+			mCurrentAnimation = "";
+			mHitBox = new GameObject(0, 0, null);
+			mWeaponHitbox = new GameObject(0, 0, null);
+			mHitBoxPosOffset = new Point(); 
+			mHitBoxSizeOffset = new Point();
+			
 			//mAABBOffset = new Point(0, 10);
 			//mAABBHeightOffset = -10;
 			super(_x, _y, null);
@@ -106,7 +112,6 @@ package
 			addAnimation(Animation_WalkRight, [0, 1, 2, 3, 4, 5, 6], mAnimationFrameRate);
 			
 			
-			mCurrentAnimation = "";
 			ChangeAnimation(Animation_Idle, GameResources.Anim_LinkWalkDown);
 		}
 		
@@ -399,6 +404,11 @@ package
 		public function getDirectionToPlayer():Point
 		{
 			return Directions[ DirectionBetween(mGame.ActivePlayer()) ];
+		}
+		
+		public function isReadyToDisplay():Boolean
+		{
+			return mAnimations.isFinishedLoading();
 		}
 	}
 

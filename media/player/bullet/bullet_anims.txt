@@ -6,8 +6,8 @@
 			"src":"../media/player/bullet/bullet.png",
 			"fw":"5",
 			"fh":"5",
-			"fps":"10",
-			"looped":"true",
+			"fps":"5",
+			"looped":"false",
 
 			"clips":
 			[
