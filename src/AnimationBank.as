@@ -1,5 +1,6 @@
 package  
 {
+	import flash.utils.SetIntervalTimer;
 	import org.flixel.FlxSprite;
 	/**
 	 * ...
@@ -32,6 +33,25 @@ package
 			}
 			
 			return false;
+		}
+		
+		public function imgContainsAnimation(img:String, name:String):Boolean
+		{
+			for (var i:uint = 0; i < mAnimations.length; i++)
+			{
+				var animation:AnimationClip = mAnimations[i];
+				if (animation.name == name)
+				{
+					if (animation.src == img)
+						return true;
+				}
+			}
+			return false;
+		}
+		
+		public function getAnimationFromImg(img:String, name:String):AnimationClip
+		{
+			
 		}
 		
 		public function getAnimation(name:String):AnimationClip

@@ -22,10 +22,19 @@ package
 		public function AnimationLoader(game:PlayState) 
 		{
 			mComplete = false;
+			mGame = game;
 		}
 		
 		public function loadBankFromFile(file:String):void
 		{
+			if (mGame.getResources().hasAnimationBank(file))
+			{
+				mAnimations = mGame.getResources().getAnimationBank(file);
+				mComplete = true;
+				dispatchEvent(new Event(Event.COMPLETE, false, false));
+				return;
+			}
+			
 			mAnimations = new AnimationBank();
 			mAnimations.Path = file;
 			mLoaderJSON = new URLLoader();
@@ -43,13 +52,14 @@ package
 				parseAnimationFromJSONObject(data.animations[i]);
 			}
 			
+			mGame.getResources().addAnimationBank(mAnimations);
 			dispatchEvent(new Event(Event.COMPLETE,false,false));
 		}
 		
 		protected function parseAnimationFromJSONObject(obj:Object)
 		{
-			var res:GameResources = new GameResources();
-			res.initResources();
+			var res:GameResources = mGame.getResources();//new GameResources();
+			//res.initResources();
 			
 			for (var i = 0; i < obj.clips.length; i++)
 			{	
@@ -57,6 +67,12 @@ package
 				
 				clip.fps = obj.fps;
 				clip.src = res.getResource(obj.img);
+				clip.looped = obj.looped == "true";
+				
+				if (clip.looped == false)
+				{
+					clip.looped = clip.looped;
+				}
 				addClip(clip);
 			}
 		}
@@ -70,6 +86,7 @@ package
 			var clip:AnimationClip = new AnimationClip(obj.name, parseFramesFromJSONClip(obj.frames), fw, fh, null);
 			clip.origin.x = obj.origin_x;
 			clip.origin.y = obj.origin_y;
+			
 			return clip;
 		}
 		

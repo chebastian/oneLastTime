@@ -3,6 +3,7 @@ package
 	import flash.automation.Configuration;
 	import flash.errors.IOError;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.geom.Point;
 	import flash.net.sendToURL;
@@ -67,27 +68,30 @@ package
 		public static const EVT_ROOM_CLEARED:int = 3;
 		public static const EVT_NUM:int = 4;
 		
-		public static var 	LEVEL_TILE_W = 32;
-		public static var 	LEVEL_TILE_H = 32;
-		public static var 	LEVEL_TILE_NUMX = 15;
-		public static var 	LEVEL_TILE_NUMY = 10;
-		protected var 		LEVEL_LEFT = 0;
-		protected var 		LEVEL_RIGHT = 32 + (LEVEL_TILE_W* LEVEL_TILE_NUMX);
-		protected var 		LEVEL_TOP = 0;
-		protected var 		LEVEL_BOTTOM = 32 + (LEVEL_TILE_H * LEVEL_TILE_NUMY);
-		protected var 		LEVEL_BUFFER_W = 8;
-		protected var 		LEVEL_BUFFER_H = 8;
+		public var 	LEVEL_TILE_W;
+		public var 	LEVEL_TILE_H;
+		public var 	LEVEL_TILE_NUMX;
+		public var 	LEVEL_TILE_NUMY;
+		protected var 		LEVEL_LEFT;
+		protected var 		LEVEL_RIGHT;
+		protected var 		LEVEL_TOP;
+		protected var 		LEVEL_BOTTOM;
+		protected var 		LEVEL_BUFFER_W;
+		protected var 		LEVEL_BUFFER_H;
 		
 		
 		public function CellRoom(game:PlayState, id:uint,path:String) 
 		{
 			super(new Point(0,0),game);
 			mGame = game;
+				
+			calculateBounds();
+			
 			mDoneLoading = false;
 			mRoomFilePath = path;
 			mUniqueId = id;
 			
-			mMap = new LevelMap();
+			mMap = new LevelMap(mGame);
 			mExits = new Array();
 			mGroupEnemies = new FlxGroup();
 			mXmlRoomData = new XML();
@@ -103,6 +107,20 @@ package
 			mSolidObjects = new FlxGroup();
 			
 			mEmpty = path.toUpperCase == FILE_EMPTY_ROOM.toUpperCase;
+		}
+		
+		private function calculateBounds():void
+		{
+			LEVEL_TILE_W = mGame.getTileWidth();
+			LEVEL_TILE_H = mGame.getTileHeight();
+			LEVEL_TILE_NUMX = 15;
+			LEVEL_TILE_NUMY = 10;
+			LEVEL_LEFT = 0;
+			LEVEL_RIGHT = LEVEL_TILE_W + (LEVEL_TILE_W* LEVEL_TILE_NUMX);
+			LEVEL_TOP = 0;
+			LEVEL_BOTTOM = LEVEL_TILE_H + (LEVEL_TILE_H * LEVEL_TILE_NUMY);
+			LEVEL_BUFFER_W = 8;
+			LEVEL_BUFFER_H = 8;
 		}
 		
 		public static function NullRoom():CellRoom
@@ -185,7 +203,7 @@ package
 			{
 				mMap.kill();
 				mMap.exists = false;
-				mMap = new LevelMap();
+				mMap = new LevelMap(mGame);
 			}
 				
 			if (mGroupEnemies.exists)
@@ -230,8 +248,11 @@ package
 			mGameObjects.sort();
 			super.update();
 			
-			FlxG.collide(mGroupEnemies, mMap);
+			FlxG.collide(mGroupEnemies, MapCollisionData());
+			FlxG.collide(mGroupEnemies, mSolidObjects);
+			FlxG.collide(mGroupEnemies, mGroupEnemies);
 			
+			handleBullets();
 			handlePlayerHitSwitch(mGame.ActivePlayer());
 			playerEnterPortal(mGame.ActivePlayer());
 			ProcessRoomGoals();
@@ -284,6 +305,26 @@ package
 			}
 		}
 		
+		public function handleBullets():void 
+		{
+			for each(var bull:Bullet in mGame.getBulletMgr().getActiveBullets().members)
+			{
+				handleBulletEnemyCollision(bull);
+			}
+		}
+		
+		public function handleBulletEnemyCollision(bullet:Bullet):void
+		{
+			for each(var enemy:Enemy in mGroupEnemies.members)
+			{
+				if (bullet.Owner != enemy.GetUniqueId())
+				{
+					if (enemy.OnHitCharacter(bullet))
+						bullet.killBullet();
+				}
+			}
+		}
+		
 		public function handlePlayerWallCollision(player:PlayerCharacter):void
 		{
 			if (FlxG.collide(player, mSolidObjects))
@@ -298,6 +339,12 @@ package
 			{
 				if(player.Attacking())
 					sw.onHit(player.WeaponHitBox());
+					
+				for each(var bullet:Bullet in mGame.getBulletMgr().getActiveBullets().members)
+				{
+					if (sw.OnHitCharacter(bullet))
+						bullet.killBullet();
+				}
 			}
 		}
 		
@@ -396,6 +443,7 @@ package
 			mMap.AddLayersToStage(mGame);
 			
 			mDoneLoading = true;
+			mGame.onEnterLevel();
 		}
 		
 		public function ParseLevelLayers(Ldata:XMLList):void {
@@ -406,7 +454,7 @@ package
 				var attributes:XMLList = node.attributes();	
 				var tiles:String = "";
 				var colTiles:String = "";
-				var newLevel:LevelMap = new LevelMap();
+				var newLevel:LevelMap = new LevelMap(mGame);
 				for each(var atr in attributes)
 				{
 					if (atr.name() == "tiles")
@@ -527,7 +575,8 @@ package
 				}
 				
 				SetEventStatus(EVT_ENEMY_CLEARED, false);
-				var createdEnemy:EnemySlime = new EnemySlime(mGame, enemyPos);
+				var createdEnemy:EnemyWalker = new EnemyWalker(mGame, enemyPos);
+				createdEnemy.Init();
 				//mGame.LAYER_ENEMY.add(createdEnemy);
 				mGameObjects.add(createdEnemy);
 				mGroupEnemies.add(createdEnemy);
@@ -536,8 +585,10 @@ package
 		
 		public function addEnemyToRoom(enemy:Enemy)
 		{
-			mGame.LAYER_ENEMY.add(enemy);
+			//mGame.LAYER_ENEMY.add(enemy);
+			mGameObjects.add(enemy);
 			mGroupEnemies.add(enemy);
+			//mGame.LAYER_ENEMY.add(enemy);
 		}
 		
 		protected function ParseTreasuresFromXml(node:XMLList):Boolean

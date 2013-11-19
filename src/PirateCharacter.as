@@ -23,7 +23,8 @@ package
 		var mWeaponReach:Number;
 		var mLoader:ExternalBitmap;
 		var mWalkAnim:FlxSprite;
-		var animLoader:AnimationLoader;
+		var mShadow:FlxSprite;
+		//var animLoader:AnimationLoader;
 		public function PirateCharacter(game:PlayState, pos:Point) 
 		{
 			super(game, pos);
@@ -34,12 +35,19 @@ package
 			super.Init();
 			mHitBox = new GameObject(this.x, this.y, null);
 			srcWH = new Point(8, 12);
-			scale.x = 4;
-			scale.y = 4;
 			
-			mAABBOffset = new Point(-10, 6);
-			mAABBHeightOffset = 12;
-			mAABBWidthOffset = 15;
+			SetSpeed(20);
+			scale.x = 1;
+			scale.y = 1;
+			//mAABBOffset = new Point(-10, 6);
+			var hOffset:int = 6;
+			mAABBOffset = new Point(1, hOffset);
+			mAABBHeightOffset = -hOffset;
+			mAABBWidthOffset = -2;
+			mBulletOriginOffset.x = 0;
+			mBulletOriginOffset.y = 0;
+			//mAABBHeightOffset = 12;
+			//mAABBWidthOffset = 15;
 			
 			mHitBoxSizeOffset = new Point(0, 0);
 			mHitBoxPosOffset = new Point(0, 0);
@@ -51,92 +59,21 @@ package
 			mWeaponHitbox.width = 3;
 			mWeaponHitbox.height = 3;
 			mAnimationFrameRate = 2;
+			mAnimationsPath = "../media/player/player_anim.txt";
+			mShadow = new FlxSprite(x, y, mGame.getResources().getResource("playerShadow"));
 		}
 		
-		override public function InitAnimations():void 
-		{	
-			var resources:GameResources = new GameResources();
-			resources.initResources();
-			//loadGraphic(resources.getResource("Player_Sheet"), true, true, 16, 16, false);
-			mCurrentAnimation = "";
-			srcWH = new Point(8, 12);
-			animLoader = new AnimationLoader(mGame);
-			
-			animLoader.loadBankFromFile("../media/player/player_anim.txt");
-			animLoader.addEventListener(Event.COMPLETE, testOnComplete);
-			ChangeAnimation(Animation_WalkDown, resources.getResource("playerWalkDown"));
-		}
-		
-		public function testOnComplete(e:Event):void 
+		public override function onAnimationLoadComplete(e:Event):void 
 		{
-			{
-				mAnimations = animLoader.getAnimationBank();
-				mAnimations.registerAnimationsToSprite(this);
-			}
-		}
-		
-		override public function onLoadedAnimations(e:Event):void 
-		{
-			var data:Object = JSON.decode(mLoaderJSON.data);	
-			
-			for (var i = 0; i < data.animations.length; i++)
-			{
-				parseAnimationFromJSONObject(data.animations[i]);
-			}
-			
-			ChangeAnimation(Animation_Idle);
-		}
-		
-		public function parseAnimationFromJSONObject(obj:Object)
-		{
-			var res:GameResources = new GameResources();
-			res.initResources();
-			
-			for (var i = 0; i < obj.clips.length; i++)
-			{	
-				var clip:AnimationClip = parseAnimationsClipFromJSONOjbect(obj.clips[i], obj.fw, obj.fh);
-				if (clip.name == Animation_Attack_L)
-				{
-					var b:Boolean = true;
-				}
-				clip.fps = obj.fps;
-				clip.src = res.getResource(obj.img);
-				addClip(clip);
-			}
-		}
-		
-		public function parseAnimationsClipFromJSONOjbect(obj:Object,fw:int,fh:int):AnimationClip
-		{
-			var clip:AnimationClip = new AnimationClip(obj.name, parseFramesFromJSONClip(obj.frames), fw, fh, null);
-			clip.origin.x = obj.origin_x;
-			clip.origin.y = obj.origin_y;
-			return clip;
-		}
-		
-		public function parseFramesFromJSONClip(strFrames:Object):Array
-		{
-			var framesArr = new Array();
-			var str = new String(strFrames);
-			var num = new String("");
-			var validStr = new String("01234567890");
-			for (var i = 0; i < str.length; i++)
-			{
-				var ch = str.charAt(i);
-				if (ch != ",")
-					num += ch;
-				else {
-					framesArr.push(parseInt(num));
-					num = "";
-				}
-			}
-			framesArr.push(parseInt(num));
-			
-			return framesArr;
+			mAnimations = animLoader.getAnimationBank();
+			mAnimations.registerAnimationsToSprite(this);
+			ChangeAnimation(Animation_WalkDown);
 		}
 		
 		override public function update():void 
 		{
 			super.update();
+				updateShadow();
 			this.mWeaponHitbox.x = this.x + (mHeading.x * this.mWeaponReach);
 			this.mWeaponHitbox.y = this.y + (mHeading.y * this.mWeaponReach);
 		}
@@ -146,10 +83,15 @@ package
 			super.UpdateHitbox();
 		}
 		
+		public function updateShadow():void
+		{
+			mShadow.x = x;
+			mShadow.y = y;
+		}
 		override public function draw():void 
 		{
+			mShadow.draw();
 			super.draw();
-			//this.mHitBox.draw();
 			//this.mWeaponHitbox.draw();
 			//drawDebug(null);
 		}
@@ -170,30 +112,37 @@ package
 			else if (FlxG.keys.pressed("LEFT"))
 			{
 				Move(new Point( -1, 0), speed);
-				ChangeAnimation(Character.Animation_WalkLeft, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkLeft, GameResources.Player_Sheet);
 			}
 			
 			else if (FlxG.keys.pressed("RIGHT"))
 			{
 				Move(new Point( 1, 0), speed);
-				ChangeAnimation(Character.Animation_WalkRight, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkRight, GameResources.Player_Sheet);
 				this.facing = RIGHT;
 			}
 			else if (FlxG.keys.pressed("UP"))
 			{
 				Move(new Point( 0, -1), speed);
-				ChangeAnimation(Character.Animation_WalkUp, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkUp, GameResources.Player_Sheet);
 			}
 			else if (FlxG.keys.pressed("DOWN"))
 			{
 				Move(new Point( 0, 1), speed);
-				ChangeAnimation(Character.Animation_WalkDown, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkDown, GameResources.Player_Sheet);
 			}
 			else
 			{
 				//ChangeAnimation(Character.Animation_Idle);
 				this.play(mCurrentAnimation, true);
 				StopMoving();
+			}
+			
+			if (FlxG.keys.justPressed("SPACE"))
+			{
+				var factory:BulletFactory = new BulletFactory(mGame);
+				//mGame.getBulletMgr().addBullet(factory.createRayFromCharacter(this, 5, 50)); 
+				mGame.getBulletMgr().addBullet(factory.createBulletFromCharacter(this, 0.2, 50));
 			}
 		}
 		

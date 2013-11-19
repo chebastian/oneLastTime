@@ -67,7 +67,7 @@ package
 			super.update();
 		}
 			
-		override public function OnHitCharacter(char:Character):void 
+		override public function OnHitCharacter(char:Character):Boolean 
 		{
 			if (char.Attacking() && char.IsFacingCharacter(this))
 			{
@@ -79,9 +79,12 @@ package
 						super.OnHitCharacter(char);
 						ChangeState(new DamagedState(this));
 						mReactions.getReaction().onAttacked();
+						return true;
 					}
 				}
 			}
+			
+			return false;
 		}
 		
 	}

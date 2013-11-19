@@ -25,12 +25,12 @@ package
 			mStateTimer = 0;
 		}
 		
-		public function StateId():uint
+		public virtual function StateId():uint
 		{
 			return mId;
 		}
 		
-		public function OnEnter():void {
+		public function OnEnter(game:PlayState):void {
 			mStateTimer = 0;
 		}
 		

@@ -24,16 +24,16 @@ package CharacterStates
 				
 		}
 		
-		override public function OnEnter():void 
+		override public function OnEnter(game:PlayState):void 
 		{
-			super.OnEnter();
+			super.OnEnter(game);
 			//mCharacter.ChangeAnimation("attack", null);
 			if(mCharacter.Heading().x < 0)
 				mCharacter.ChangeAnimation("attackL", null);
 			else if(mCharacter.Heading().x != 0)
 				mCharacter.ChangeAnimation("attackR", null);
 			
-			if (mCharacter.Heading().y == 1)
+			else if (mCharacter.Heading().y == 1)
 				mCharacter.ChangeAnimation("attackD", null);
 				
 			else if (mCharacter.Heading().y < 0)

@@ -112,6 +112,7 @@ package
 		
 		public function LoadLevel(path:String):Boolean
 		{
+			LoadFinished = false;
 			mLevelFilePath = path;
 			var xmlLoader:URLLoader = new URLLoader();
 			var xmlData:XML = new XML();
@@ -139,7 +140,7 @@ package
 			mMiniMap = new MiniMap(this, 0, 0);
 			mMiniMap.GenerateMap();
 			LoadFinished = true;
-			mGame.onEnterLevel();
+			//mGame.onEnterLevel();
 			//mGame.add(mMiniMap);
 		}
 		
@@ -340,7 +341,7 @@ package
 					}
 				}
 				
-				var wallSwitch:WallSwitch = new WallSwitch(mGame, pos.x * 32, pos.y * 32);
+				var wallSwitch:WallSwitch = new WallSwitch(mGame, pos.x * mGame.getTileWidth(), pos.y * mGame.getTileHeight());
 				wallSwitch.setOpen(open);
 				//mGameObjects.add(wallSwitch);
 				room.addWallSwitch(wallSwitch);

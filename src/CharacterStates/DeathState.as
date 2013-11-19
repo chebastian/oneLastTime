@@ -13,10 +13,10 @@ package CharacterStates
 			mStateTimer = 0;
 		}
 		
-		override public function OnEnter():void 
+		override public function OnEnter(game:PlayState ):void 
 		{
-			super.OnEnter();
-			mCharacter.ChangeAnimation("death", GameResources.Anim_SlimeDeath);
+			super.OnEnter(game);
+			mCharacter.ChangeAnimation("death");
 		}
 		
 		override public function OnUpdate():void 

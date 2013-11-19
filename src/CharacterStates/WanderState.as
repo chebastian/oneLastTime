@@ -13,12 +13,17 @@ package CharacterStates
 		var mTimeTillTurn:Number;
 		var mMaxTimeTillTurn:Number = 3;
 		
-		public function WanderState(id:uint, char:Character) 
+		public function WanderState(char:Character) 
 		{
-			super(id, char);
-			mCharacter.WalkInDir(new Point(0, 1));
+			super(4326749621, char);
+			//mCharacter.ChangeAnimation("walkUp", GameResources.Anim_SlimeWalk);
+		}
+		
+		override public function OnEnter(game:PlayState):void 
+		{
+			mCharacter.WalkInDir(new Point(1, 0));
 			SetNextTurnTime();
-			mCharacter.ChangeAnimation("walkUp", GameResources.Anim_SlimeWalk);
+			super.OnEnter(game);
 		}
 		
 		override public function OnUpdate():void 
@@ -34,7 +39,21 @@ package CharacterStates
 				OnTurn();
 			}
 			
+			updateAnimationBasedOnHeading();
 			mElapsedTime += FlxG.elapsed;
+		}
+		
+		public function updateAnimationBasedOnHeading():void
+		{
+			if (mCharacter.Heading().x < 0)
+				mCharacter.ChangeAnimation(mCharacter.Animation_WalkLeft);
+			else if (mCharacter.Heading().x > 0)
+				mCharacter.ChangeAnimation(mCharacter.Animation_WalkRight);
+			
+			else if (mCharacter.Heading().y < 0)
+				mCharacter.ChangeAnimation(mCharacter.Animation_WalkUp);
+			else if (mCharacter.Heading().y > 0)
+				mCharacter.ChangeAnimation(mCharacter.Animation_WalkDown);
 		}
 		
 		public function OnHitWall():void
@@ -50,7 +69,11 @@ package CharacterStates
 				if ((rand > 0.5) && (rand2 > 0.5))
 					xy *= 0;
 				
-				mCharacter.TurnInDir(new Point(xd,xy));
+				
+					var point:Point = new Point(xd, xy);
+					point.normalize(1.0);
+				//mCharacter.TurnInDir(new Point(xd,xy));
+				mCharacter.TurnInDir(point);
 			
 			mCharacter.WalkInDir(mCharacter.Heading());
 			SetNextTurnTime();
@@ -75,7 +98,10 @@ package CharacterStates
 				if ((rand > 0.5) && (rand2 > 0.5))
 					xy *= 0;
 				
-				mCharacter.TurnInDir(new Point(xd,xy));
+					var point:Point = new Point(xd, xy);
+					point.normalize(1.0);
+				//mCharacter.TurnInDir(new Point(xd,xy));
+				mCharacter.TurnInDir(point);
 			}
 			
 			mCharacter.WalkInDir(mCharacter.Heading());

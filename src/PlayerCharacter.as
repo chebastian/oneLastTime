@@ -27,7 +27,7 @@ package
 		override public function InitAnimations():void 
 		{
 			super.InitAnimations();
-			addAnimation("attack",[8,8], 2,true);
+			//addAnimation("attack",[8,8], 2,true);
 		}
 		
 		override public function update():void 
@@ -50,34 +50,34 @@ package
 			if (FlxG.keys.pressed("LEFT"))
 			{
 				Move(new Point( -1, 0), speed);
-				ChangeAnimation(Character.Animation_WalkLeft, GameResources.Anim_LinkWalkLeft);
+				ChangeAnimation(this.Animation_WalkLeft, GameResources.Anim_LinkWalkLeft);
 			}
 			
 			else if (FlxG.keys.pressed("RIGHT"))
 			{
 				Move(new Point( 1, 0), speed);
-				ChangeAnimation(Character.Animation_WalkRight, GameResources.Anim_LinkWalkRight);
+				ChangeAnimation(this.Animation_WalkRight, GameResources.Anim_LinkWalkRight);
 			}
 			else if (FlxG.keys.pressed("UP"))
 			{
 				Move(new Point( 0, -1), speed);
-				ChangeAnimation(Character.Animation_WalkUp, GameResources.Anim_LinkWalkUp);
+				ChangeAnimation(this.Animation_WalkUp, GameResources.Anim_LinkWalkUp);
 			}
 			else if (FlxG.keys.pressed("DOWN"))
 			{
 				Move(new Point( 0, 1), speed);
-				ChangeAnimation(Character.Animation_WalkDown, GameResources.Anim_LinkWalkDown);
+				ChangeAnimation(this.Animation_WalkDown, GameResources.Anim_LinkWalkDown);
 			}
 			else
 			{
-				ChangeAnimation(Character.Animation_Idle);
+				ChangeAnimation(this.Animation_Idle);
 				StopMoving();
 			}
 		}
 		
-		override public function OnHitCharacter(char:Character):void 
+		override public function OnHitCharacter(char:Character):Boolean 
 		{
-			super.OnHitCharacter(char);
+			return super.OnHitCharacter(char);
 		}
 		
 		public function HasKeys():Boolean

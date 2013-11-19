@@ -14,20 +14,25 @@ package
 	 import flash.geom.Point;
 	 import flash.net.URLLoader;
 	 import flash.net.URLRequest;
+	 import flash.printing.PrintJobOrientation;
 	 import GameObject;
 	public class Character extends GameObject
 	{
 		
-		public static var Animation_Idle:String = "idle";
-		public static var Animation_WalkLeft:String = "walkLeft";
-		public static var Animation_WalkRight:String = "walkRight";
-		public static var Animation_WalkUp:String = "walkUp";
-		public static var Animation_WalkDown:String = "walkDown";
+		public var Animation_Idle:String = "idle";
+		public var Animation_WalkLeft:String = "walkLeft";
+		public var Animation_WalkRight:String = "walkRight";
+		public var Animation_WalkUp:String = "walkUp";
+		public var Animation_WalkDown:String = "walkDown";
 		
-		public static var Animation_Attack_R:String = "attackR";
-		public static var Animation_Attack_L:String = "attackL";
-		public static var Animation_Attack_D:String = "attackD";
-		public static var Animation_Attack_U:String = "attackU";
+		public var Animation_Attack_R:String = "attackR";
+		public var Animation_Attack_L:String = "attackL";
+		public var Animation_Attack_D:String = "attackD";
+		public var Animation_Attack_U:String = "attackU";
+		public var Animation_DamagedR:String = "damagedR";
+		public var Animation_DamagedL:String = "damagedL";
+		public var Animation_DamagedU:String = "damagedU";
+		public var Animation_DamagedD:String = "damagedD";
 		
 		var mCurrentAnimation:String;
 		
@@ -50,17 +55,23 @@ package
 		
 		var mHitBoxPosOffset:Point;
 		var mHitBoxSizeOffset:Point;
-		var srcWH:Point;
+		protected var srcWH:Point;
 		
 		/*Loader for JSON*/
 		var mLoaderJSON:URLLoader;
 		
 		/*TEMP FOR ATTACKING*/
+		protected var animLoader:AnimationLoader;
 		var mAnimations:AnimationBank;
+		protected var mAnimationsPath:String;
 		var mCurrentImg:Class;
 		
 		/*Char attackreacktion*/
 		protected var mReactions:ReactionManager;
+		protected var mBulletOriginOffset;
+		
+		protected var mCurrentWeapon:Weapon;
+		
 		
 		public function Character(game:PlayState, _x:Number, _y:Number) 
 		{
@@ -69,13 +80,14 @@ package
 			mHitBox = new GameObject(0, 0, null);
 			mWeaponHitbox = new GameObject(0, 0, null);
 			mHitBoxPosOffset = new Point(); 
+			mBulletOriginOffset = new Point(0, 0);
 			mHitBoxSizeOffset = new Point();
 			
 			//mAABBOffset = new Point(0, 10);
 			//mAABBHeightOffset = -10;
 			super(_x, _y, null);
-			mAABBOffset = new Point(0, 16);
-			mAABBHeightOffset = -16;
+			mAABBOffset = new Point(0, 0);
+			mAABBHeightOffset = -0;
 			mLookAt = new Point(0, 0);	
 			maxVelocity.y = WALK_SPEED;
 			maxVelocity.x = WALK_SPEED;
@@ -83,15 +95,16 @@ package
 			mHeading = new Point(0, 0);
 			mIsAttacking = false;
 			mAnimationFrameRate = 10;
-			srcWH = new Point(32, 32);
+			srcWH = new Point(0, 0);
 			mAnimations = new AnimationBank();
 			mReactions = new ReactionManager(this);
-			Init();
+			mAnimationsPath = "";
+			//Init();
 		}
 		
 		override public function Init():void 
 		{
-			InitAnimations();
+			//InitAnimations();
 			mState = new IdleState(0, this);
 			mStrength = 1.0;
 			mHealth = 100.0;
@@ -100,11 +113,12 @@ package
 			mHitBox = new GameObject(x, y, null);
 			mHitBoxPosOffset = new Point(0, 0);
 			mHitBoxSizeOffset = new Point(0, 0);
+			mCurrentWeapon = new Weapon(mGame, 1.0 / 3.0, 50, 0.5);
 		}
 		
 		public virtual function InitAnimations():void
 		{
-			loadGraphic(GameResources.Anim_LinkWalkDown, true, false, srcWH.x, srcWH.y, false);
+			/*loadGraphic(GameResources.Anim_LinkWalkDown, true, false, srcWH.x, srcWH.y, false);
 			addAnimation(Animation_Idle,[0],mAnimationFrameRate);
 			addAnimation(Animation_WalkLeft,[0,1,2,3,4,5,6],mAnimationFrameRate);
 			addAnimation(Animation_WalkDown,[0,1,2,3,4,5,6,7],mAnimationFrameRate);
@@ -112,7 +126,23 @@ package
 			addAnimation(Animation_WalkRight, [0, 1, 2, 3, 4, 5, 6], mAnimationFrameRate);
 			
 			
-			ChangeAnimation(Animation_Idle, GameResources.Anim_LinkWalkDown);
+			ChangeAnimation(Animation_Idle, GameResources.Anim_LinkWalkDown);*/
+			//var resources:GameResources = new GameResources();
+			//resources.initResources();
+			//loadGraphic(resources.getResource("Player_Sheet"), true, true, 16, 16, false);
+			mCurrentAnimation = "";
+			//srcWH = new Point(8, 12);
+			animLoader = new AnimationLoader(mGame);
+			
+			animLoader.addEventListener(Event.COMPLETE, onAnimationLoadComplete);
+			animLoader.loadBankFromFile(mAnimationsPath);
+			//ChangeAnimation(Animation_WalkDown, resources.getResource("playerWalkDown"));
+		}
+		
+		public virtual function onAnimationLoadComplete(e:Event):void
+		{
+			mAnimations = animLoader.getAnimationBank();
+			mAnimations.registerAnimationsToSprite(this);
 		}
 		
 		public function loadAnimationFromJSON(path:String)
@@ -148,7 +178,7 @@ package
 			
 			mState = null;
 			mState = state;
-			mState.OnEnter();
+			mState.OnEnter(mGame);
 		}
 		
 		public function IsInState(state:int):Boolean
@@ -167,11 +197,12 @@ package
 			velocity.y = dir.y * dist;
 			
 			mHeading = dir;
+			updateLookAt();
 		}
-		public function ChangeAnimation(name:String, img:Class = null):void
+		public function ChangeAnimation(name:String, img:Class = null,force:Boolean = false):void
 		{
 	
-			if(IsPlayingAnimation(name))
+			if(IsPlayingAnimation(name) && !force)
 				return;
 				
 			if (img != null)
@@ -192,7 +223,7 @@ package
 				
 				var clip:AnimationClip = mAnimations.getAnimation(name);
 				if (clip.src != null)
-					loadGraphic(clip.src, true, false, clip.fw, clip.fh, false);
+					loadGraphic(clip.src, true , false, clip.fw, clip.fh, false);
 					
 				else if (clip.fh != srcWH.y || clip.fw != srcWH.x)
 					loadGraphic(mCurrentImg, true, false, clip.fw, clip.fh, false);
@@ -219,7 +250,8 @@ package
 		
 		public function IsPlayingAnimation(name:String):Boolean
 		{
-			if(mCurrentAnimation.toLocaleLowerCase() == name.toLocaleLowerCase())
+			if (mCurrentAnimation.toLocaleLowerCase() == name.toLocaleLowerCase() ||
+			name == "")
 				return true;
 			
 			return false;
@@ -246,7 +278,7 @@ package
 			//Update players attackHitBox, used for dealing damage
 			//this box will be moved around depending on players heading
 			var hitDist:Number = 0.0;
-			mWeaponHitbox.x = x + mHeading.x * hitDist;
+ 			mWeaponHitbox.x = x + mHeading.x * hitDist;
 			mWeaponHitbox.y = y + mHeading.y * hitDist;
 			mWeaponHitbox.width = width;
 			mWeaponHitbox.height = height;
@@ -254,10 +286,7 @@ package
 		
 		protected function updateLookAt():void
 		{
-			if (mHeading.x != 0 && mHeading.y != 0)
-			{
-				mLookAt = mHeading;
-			}
+			mLookAt = mHeading;
 		}
 		
 		public function TurnRight()
@@ -296,12 +325,16 @@ package
 		// Called when character hits another character
 		// ex: When player hits character, receive dmg or do dmg depending on state
 		//
-		public function OnHitCharacter(char:Character):void
+		public function OnHitCharacter(char:Character):Boolean
 		{
 			if (char.Attacking())
 			{
 				mReactions.getReaction().onAttacked();
+				return true;
 			}
+			
+			return false;
+			
 		}
 		
 		public function HeadForCharacter(char:Character):void 
@@ -319,6 +352,8 @@ package
 			dir.y = y - char.y;
 			dir.normalize(1.0);
 			
+			areFacingEachother(char);
+			
 			if (dir.x < 0 && mHeading.x > 0)
 				return true;
 			else if (dir.x > 0 && mHeading.x < 0)
@@ -326,6 +361,18 @@ package
 			else if (dir.y < 0 && mHeading.y > 0)
 				return true;
 			else if (dir.y > 0 && mHeading.y < 0)
+				return true;
+			
+			return false;
+		}
+		
+		public function areFacingEachother(char:Character):Boolean
+		{
+			var toChar:Point = new Point(x - char.x, y -char.y);
+			toChar.normalize(1.0);
+			
+			var dot:Number = (getLookAt().x * toChar.x) + (getLookAt().y * toChar.y);
+			if (dot < 0.0)
 				return true;
 			
 			return false;
@@ -362,7 +409,7 @@ package
 		
 		public function Attacking():Boolean
 		{
-			return IsInState(CharacterState.ATTACK_STATE);
+			return mIsAttacking;
 		}
 		
 		public function Strength():Number
@@ -396,9 +443,9 @@ package
 			return mHealth;
 		}
 		
-		public function getLookAt():Point
+		public function getLookAt():Point 
 		{
-			return mLookAt;
+			return mLookAt.clone();
 		}
 		
 		public function getDirectionToPlayer():Point
@@ -409,6 +456,25 @@ package
 		public function isReadyToDisplay():Boolean
 		{
 			return mAnimations.isFinishedLoading();
+		}
+		
+		public function getBulletOrigin():Point
+		{
+			var pos:Point = new Point(x + mBulletOriginOffset.x, y+mBulletOriginOffset.y);
+			
+			return pos;
+		}
+		
+		public function getWeapon():Weapon
+		{
+			return mCurrentWeapon;
+		}
+		
+		public function fireCurrentWeapon():void
+		{
+			var fireRate:Number = 3.0 / 1.0;
+			var factory:BulletFactory = new BulletFactory(mGame);
+			mGame.getBulletMgr().addBullet(factory.createBulletFromCharacter(this, 0.5, 50));
 		}
 	}
 

@@ -21,8 +21,8 @@ package
 		protected var mCollisionIndex:int;
 		public var mCollisionMap:FlxTilemap;
 		
-		public static const TILE_WIDTH:uint = 32;
-		public static const TILE_HEIGHT:uint = 32;
+		public var TILE_WIDTH:uint = 32;
+		public var TILE_HEIGHT:uint = 32;
 		public var CollisionmapLoaded:Boolean;
 		
 		var mLayers:Array;
@@ -32,9 +32,12 @@ package
 		//Test
 		var testIndex:int = 0;
 		
-		public function LevelMap() 
+		public function LevelMap(game:PlayState) 
 		{
 			super();
+			TILE_WIDTH = game.getTileWidth();
+			TILE_HEIGHT = game.getTileHeight();
+			
 			mCollisionIndex = 2;
 			mCollisionMap = new FlxTilemap();
 			CollisionmapLoaded = false;

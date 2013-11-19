@@ -14,8 +14,8 @@ package
 		public function MenuState() 
 		{
 			super();
-			add(new FlxText(FlxG.width * 0.4, FlxG.height * 0.2, 200, ""));
-			add(new FlxText(FlxG.width * 0.3, FlxG.height * 0.3, 200, "Press ENTER to Continue"));
+			add(new FlxText(10, 10, FlxG.height*0.2, ""));
+			add(new FlxText(10, 10, FlxG.height*0.2, "Press ENTER to Continue"));
 			//FlxG.switchState(new PlayState());
 		}
 		

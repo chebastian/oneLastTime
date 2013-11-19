@@ -77,14 +77,15 @@ package
 			if (FlxG.keys.justPressed("SPACE"))
 			{
 				var bullFac:BulletFactory = new BulletFactory(mGame);
-				var bullet:Bullet = bullFac.createBulletFromCharacter(mGame.ActivePlayer(), 2.0, 150.0);
- 				Manager.addBullet(bullet);
+				var bullet:Bullet = bullFac.createBulletFromCharacter(mGame.ActivePlayer(), 2.0, 50.0);
+ 				mGame.getBulletMgr().addBullet(bullet);
 			}
 		}
 		
 		public function testUpdate():void 
 		{
 			Manager.removeInactiveBullets();
+			mGame.getBulletMgr().removeInactiveBullets();
 		}
 		
 		public function testDraw():void

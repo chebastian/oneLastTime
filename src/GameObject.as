@@ -92,11 +92,11 @@ package
 		
 		public function IsInlineWith(obj:GameObject):Boolean
 		{
-			var xdistLeft = obj.x - (x + frameWidth*0.5);
+			var xdistLeft = obj.x - (x );
 			var xdistRight = (obj.x + obj.frameWidth) - (x + frameWidth*0.5);
 			
 			var ydistTop = obj.y - y;
-			var ydistBottom = (obj.y + obj.frameHeight - y);
+			var ydistBottom = (obj.y + obj.frameHeight) - (y + frameHeight);
 			
 			if ((xdistLeft < frameWidth && xdistRight > 0) ||
 				(xdistLeft < 0 && xdistRight > 0))

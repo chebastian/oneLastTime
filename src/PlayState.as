@@ -18,6 +18,8 @@ package
 	import LevelMap;
 	import org.flixel.FlxTileblock;
 	import org.flixel.system.FlxList;
+	import Tests.TurretTest;
+	import Tests.WalkerTest;
 	import TransitionEffect;
 	import Character;
 	import CellRoom;
@@ -47,12 +49,17 @@ package
 		
 		public var PlayerCurrentItems:FlxGroup;
 		public var Keys:uint;
-		public static var TILE_WIDTH:int = 32;
-		public static var TILE_HEIGHT:int = 32;
+		public static var TILE_WIDTH:int = 8;
+		public static var TILE_HEIGHT:int = 8;
 		
 		
 		private var mBulletMgr:BulletManager;
 		private var mBulletTest:BulletTest;
+		
+		private var mWalkerTest:WalkerTest;
+		private var mTurretTest:TurretTest;
+		
+		private var mResources:GameResources;
 		
 		public function PlayState() 
 		{
@@ -62,6 +69,9 @@ package
 		override public function create():void 
 		{
 			super.create();
+			
+			mResources = new GameResources();
+			mResources.initResources();
 			
 			FlxG.debug = false;
 			//testCamera();
@@ -73,7 +83,7 @@ package
 			//mTransEffect = new TransitionEffect(this);
 			//mTransEffect.init(20, 20, 5);
 			//mTransEffect.addEventListener("Fade Complete", FadeComplete);
-			mPlayer = new PirateCharacter(this, new Point(300, 200));
+			mPlayer = new PirateCharacter(this, new Point(30, 30));
 			mPlayer.Init();
 			mPlayer.InitAnimations();
 			PlayerCurrentItems = new FlxGroup();
@@ -81,10 +91,14 @@ package
 			LAYER_ENEMY.add(mPlayer);
 			mCellLevel = new CellLevel(this);
 			//mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
-			mCellLevel.LoadLevel("../media/levels/tt/tt.xml");
+			mCellLevel.LoadLevel("../media/levels/testy/testy.xml");
 			
 			mBulletMgr = new BulletManager(this);
-			mBulletTest = new BulletTest(this);
+//			mBulletTest = new BulletTest(this);
+			mWalkerTest = new WalkerTest(this);
+		//	mWalkerTest.initTest();
+			mTurretTest = new TurretTest(this);
+			
 		}
 		
 		public function testCamera():void {
@@ -181,15 +195,23 @@ package
 		{
 			super.update();
 			FlxG.collide(mPlayer, mCellLevel.ActiveRoom().MapCollisionData());
+			FlxG.collide(getBulletMgr().getActiveBullets(), mCellLevel.ActiveRoom().MapCollisionData());
 			
 			HandleEnemyCollision();
 			HandleDebugInput();
 			mCellLevel.update();
 			
-			mBulletTest.handleInput();
-			mBulletTest.testUpdate();
+			//mBulletTest.handleInput();
+			//mBulletTest.testUpdate();
 			//testUpdateCam();
-			
+			mWalkerTest.testUpdate();
+			mTurretTest.udpate();
+			updateBullets();
+		}
+		
+		public function updateBullets():void
+		{
+			mBulletMgr.removeInactiveBullets();
 		}
 		
 		public function HandleDebugInput():void
@@ -285,14 +307,6 @@ package
 		
 		public function switchToLevelThroughPortal(p:CellLevelPortal)
 		{
-			//clearLevel();
-			//LoadLevel(p.getDestination()); //Add a callbackfunc to change position, room index and so on after load.
-			//ChangeRoom(new Point(p.getRoom().MapIndex().x, p.getRoom().MapIndex().y));
-			
-			//var destPortal:CellLevelPortal = ActiveRoom().getPortalFromId(p.getIdentifier());
-			
-			//mGame.ActivePlayer().setPosition(new Point(destPortal.x, destPortal.y));
-			//destPortal.passThroughPortal(mGame.ActivePlayer());
 			ActiveLevel().clearLevel();
 			
 			var newLevel:CellLevel = new CellLevel(this);
@@ -312,11 +326,30 @@ package
 				portalExit.passThroughPortal(mPlayer);
 				
 			}
+			
+			if (ActiveLevel().LoadFinished)
+			{
+				mWalkerTest.initTest();
+				mTurretTest.inti();
+			}
 		}
 		
 		public function getBulletMgr():BulletManager
 		{
 			return mBulletMgr;
+		}
+		
+		public function getResources():GameResources
+		{
+			return mResources;
+		}
+		
+		public function PlaySoundEffect(name:String,vol:Number=1.0):void
+		{
+			if (!getResources().hasSound(name) )
+				return;
+				
+			FlxG.play(getResources().getSound(name),vol);
 		}
 	}
 

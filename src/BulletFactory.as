@@ -13,14 +13,38 @@ package
 			mGame = game;
 		}
 		
-		public function createBulletFromCharacter(char:Character, lifeTime:Number, speed:Number)
+		public function createBulletFromCharacter(char:Character, lifeTime:Number, speed:Number):Bullet
 		{
-			var bullet:Bullet = new Bullet(mGame, char.x, char.y,char.Heading());
+			//var bullet = createSimpleBullet();
+			var x:int = new int(char.getBulletOrigin().x);
+			var y:int = new int(char.getBulletOrigin().y);
 			
+			var bullet:Bullet = new Bullet(mGame, x, y,new Point(char.getLookAt().x,char.getLookAt().y));
+
+			bullet.Init();
 			bullet.SetSpeed(speed);
-			bullet.velocity.x = char.getLookAt().x;
-			bullet.velocity.y = char.getLookAt().y;
-			bullet.LifeTime = 1.0;
+			//bullet.velocity.x = new Number(char.getLookAt().x);
+			//bullet.velocity.y = new Number(char.getLookAt().y);
+			bullet.LifeTime = lifeTime;
+			bullet.Owner = char.GetUniqueId();
+
+			bullet.InitAnimations();
+			
+			return bullet;
+		}
+		
+		public function createRayFromCharacter(char:Character, lifeTime:Number, speed:Number):BulletRay
+		{
+			var x:int = new int(char.getBulletOrigin().x);
+			var y:int = new int(char.getBulletOrigin().y);
+			
+			var bullet:BulletRay = new BulletRay(mGame, x, y, new Point(char.Heading().x, char.Heading().y));
+			bullet.SetSpeed(speed);
+			bullet.velocity.x = new Number(char.getLookAt().x);
+			bullet.velocity.y = new Number(char.getLookAt().y);
+			bullet.LifeTime = lifeTime;
+
+			bullet.InitAnimations();
 			
 			return bullet;
 		}

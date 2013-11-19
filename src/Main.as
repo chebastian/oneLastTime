@@ -10,7 +10,7 @@ package {
 		static var LAYER_BKG:FlxGroup = new FlxGroup();
 		public function Main():void
 		{
-			super(640, 480, MenuState, 1);
+			super(640, 480, MenuState, 5);
 			//useDefaultHotKeys = true;
 		}
 	}

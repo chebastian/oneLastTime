@@ -1,9 +1,14 @@
 package  
 {
+	import CharacterStates.BulletExplodeState;
+	import CharacterStates.BulletTravelState;
+	import org.flixel.FlxCamera;
+	import adobe.utils.CustomActions;
 	import CharacterStates.IdleState;
 	import com.adobe.air.crypto.EncryptionKeyGenerator;
 	import flash.events.Event;
 	import flash.geom.Point;
+	import org.flixel.FlxBasic;
 	import org.flixel.FlxPoint;
 	import org.flixel.FlxG;
 	
@@ -14,10 +19,12 @@ package
 	public class Bullet extends Character 
 	{
 		var mAnimLoader:AnimationLoader;
-		var LifeTime:Number;
+		public var LifeTime:Number;
 		var TimeSinceCreation:Number;
-		var Owner:int;
+		public var Owner:int;
 		protected var VelDir:Point;
+		protected var Killed:Boolean;
+		protected var mFireSound:String;
 		
 		public function Bullet(game:PlayState, _x:Number, _y:Number,dir:Point) 
 		{
@@ -26,30 +33,37 @@ package
 			TimeSinceCreation = 0.0;
 			LifeTime = 5.0;
 			Owner = 0;
+			Killed = false;
 			active = true;
-			VelDir = dir;
+			VelDir = new Point(dir.x, dir.y);
+			VelDir.normalize(1.0);
 			Init();
-			InitAnimations();
+			height = 5;
+			width = 5;
+			mAABBOffset = new Point(0, 0);
+			mAABBWidthOffset = 0;
+			mAABBHeightOffset = 0;
+			mBulletOriginOffset = new Point(0, 0);
+			srcWH = new Point(0, 0);
+			mIsAttacking = true;
+			mAnimationsPath = "../media/player/bullet/bullet_anims.txt";
 		}
 		
 		override public function Init():void 
 		{
-			mState = new IdleState(0, this);
-			scale.x = 5;
-			scale.y = 5;
+			//mState = new BulletTravelState(this);
+			mFireSound = "bullet_shoot";
+			ChangeState(new BulletTravelState(this));
+			mIsAttacking = true;
+			mWeaponHitbox = new GameObject(x, y, null);
+			mHitBox = new GameObject(x, y, null);
+			mHitBoxPosOffset = new Point(0, 0);
+			mHitBoxSizeOffset = new Point(0, 0);
 		}
 		
-		override public function InitAnimations():void 
+		override public function onAnimationLoadComplete(e:Event):void 
 		{
-			mAnimLoader = new AnimationLoader(mGame);
-			mAnimLoader.loadBankFromFile("../media/player/bullet/bullet_anims.txt");
-			mAnimLoader.addEventListener(Event.COMPLETE, completeLoad);
-		}
-		
-		private function completeLoad(e:Event):void
-		{
-			mAnimations = mAnimLoader.getAnimationBank();
-			mAnimations.registerAnimationsToSprite(this);
+			super.onAnimationLoadComplete(e);
 			ChangeAnimation("fire");
 		}
 		
@@ -58,16 +72,12 @@ package
 			if (!isReadyToDisplay())
 				return;
 				
-			UpdateHitbox();
-			updateLookAt();
-			if (active)
+			if (active && exists)
 			{
-				updateLifeTime();
-				updatePosition();
-				if (isTimeToDie())
-				{
-					active = false;
-				}
+				UpdateHitbox();
+				updateLookAt();
+
+				mState.OnUpdate();
 			}
 		}
 		
@@ -75,11 +85,13 @@ package
 		{
 			if(isReadyToDisplay())
 				super.draw();
+				
+			
 		}
 		
 		public virtual function updatePosition():void
 		{
-			Move(mHeading, Speed());
+			Move(VelDir, Speed());
 		}
 		
 		public virtual function updateLifeTime():void
@@ -89,7 +101,34 @@ package
 		
 		public virtual function isTimeToDie():Boolean
 		{
-			return finished;
+			return (TimeSinceCreation >= LifeTime) || Killed;
+		}
+		
+		override public function OnHitCharacter(char:Character):Boolean 
+		{
+			super.OnHitCharacter(char);
+			if (!IsInState(BulletExplodeState.STATE_ID))
+			{
+				ChangeState(new BulletExplodeState(this));
+				return true;
+			}
+				
+			return false;
+		}
+		
+		public function killBullet():void
+		{
+			Killed = true;
+		}
+		
+		public function setDir(dir:Point):void
+		{
+			mHeading = dir;
+		}
+		
+		public function getFireSoundEffect():String
+		{
+			return mFireSound;
 		}
 	}
 

@@ -14,13 +14,20 @@ package CharacterStates
 			super(DAMAGED_STATE, char);
 		}
 		
-		override public function OnEnter():void 
+		override public function OnEnter(game:PlayState):void 
 		{
-			super.OnEnter();
-			mCharacter.ChangeAnimation("damaged", GameResources.Anim_SlimeDamaged);
 			trace("DAMAGER");
 			mStateTimer = 0.0;
+			changeAnimBasedOnDir();
 			mCharacter.WalkInDir(new Point(0, 0));
+		}	
+		
+		public function changeAnimBasedOnDir():void
+		{
+			if(mCharacter.Heading().x > 0)
+				mCharacter.ChangeAnimation(mCharacter.Animation_DamagedR);
+			else if (mCharacter.Heading().x < 0)
+				mCharacter.ChangeAnimation(mCharacter.Animation_DamagedL);
 		}
 		
 		override public function OnExit():void 
@@ -33,7 +40,7 @@ package CharacterStates
 			super.OnUpdate();
 			
 			if (mCharacter.finished)
-				mCharacter.ChangeState(new WanderState(0, mCharacter));
+				mCharacter.ChangeState(new WanderState(mCharacter));
 		}
 		
 	}

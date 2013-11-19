@@ -12,7 +12,7 @@ package  RoomAssets
 		public function RaisableWall(_x:Number, _y:Number) 
 		{
 			super(_x, _y, null);
-			loadGraphic(GameResources.RaisableWall, true, false, 32, 32, false);
+			loadGraphic(GameResources.RaisableWall, true, false, 7, 7, false);
 			Init();
 			mIsOpen = true;
 			

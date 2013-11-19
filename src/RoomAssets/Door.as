@@ -18,7 +18,7 @@ package  RoomAssets
 		
 		public function Door(game:PlayState ,id:String, pos:Point ,locked:Boolean) 
 		{
-			super(pos.x * CellRoom.LEVEL_TILE_W, pos.y * CellRoom.LEVEL_TILE_H,null);
+			super(pos.x * game.getTileWidth(), pos.y * game.getTileHeight(),null);
 			mGame = game;
 			loadGraphic(GameResources.Tile_Locked, false, false, 32, 32, false);
 			mGame.LAYER_ITEM.add(this);

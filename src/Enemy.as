@@ -18,7 +18,7 @@ package
 		public function Enemy(game:PlayState ,pos:Point) 
 		{
 			super(game, pos.x, pos.y);
-			mState = new WanderState(0, this);
+			//mState = new WanderState(0, this);
 		}
 		
 		override public function Init():void 
@@ -27,12 +27,14 @@ package
 			super.Init();
 		}	
 		
-		override public function OnHitCharacter(char:Character):void 
+		override public function OnHitCharacter(char:Character):Boolean 
 		{
 			if (char.Attacking())
 			{
-				
+				return true;
 			}
+			
+			return false;
 		}
 		
 		override public function update():void 

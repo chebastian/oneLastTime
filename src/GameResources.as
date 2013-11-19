@@ -1,5 +1,6 @@
 package  
 {
+	import flash.media.Sound;
 	import flash.utils.Dictionary;
 	/**
 	 * ...
@@ -9,11 +10,16 @@ package
 	{
 		
 		var mImages:Dictionary;
+		var mAnimationBanks:Dictionary;
+		var mSound:Dictionary;
 		
 		public function GameResources() 
 		{
 			mImages = new Dictionary();
-			trace("INSTANCE CREATED");
+			mAnimationBanks = new Dictionary();
+			mSound = new Dictionary();
+			
+			trace("RESOURCE INSTANCE CREATED");
 		}
 		
 		public function initResources():void
@@ -65,6 +71,13 @@ package
 				addResource("Skeleton_walkLR", skeleton_anim);
 				
 				addPlayerResources();
+				addEnemyResources();
+				addSoundEffects();
+				
+				
+				[Embed(source = "../media/wallSwitch/wallSwitch.png")]
+				var wallSwitch:Class;
+				addResource("wallSwitch", wallSwitch);
 		}
 		
 		private function addPlayerResources():void
@@ -84,11 +97,78 @@ package
 			[Embed(source = "../media/player/bullet/bullet.png")]
 			var bullet:Class;
 			
+			[Embed(source = "../media/player/bullet/ray.png")]
+			var bulletRay:Class;
+			
+			[Embed(source = "../media/player/playerShadow.png")]
+			var shadow:Class;
+			
 			addResource("playerWalkLeft", walkLeft);
 			addResource("playerWalkRight", walkRight);
 			addResource("playerWalkUp", walkUp);
 			addResource("playerWalkDown", walkDown);
+			addResource("playerShadow", shadow);
 			addResource("bullet", bullet);
+			addResource("bulletRay", bulletRay);
+		}
+		
+		public function addEnemyResources():void
+		{
+			[Embed(source = "../media/enemy/awlker/walkLeft.png")]
+			var walkerLeft:Class;
+			
+			[Embed(source = "../media/enemy/awlker/walkRight.png")]
+			var walkerRight:Class;
+			
+			[Embed(source = "../media/enemy/awlker/attackLeft.png")]
+			var attack:Class;
+			
+			[Embed(source = "../media/enemy/awlker/attackRight.png")]
+			var attackR:Class;
+			
+			[Embed(source = "../media/enemy/awlker/damagedRight.png")]
+			var damagedR:Class;
+			
+			[Embed(source = "../media/enemy/turret/turret.png")]
+			var turret:Class;
+			
+			[Embed(source = "../media/explosion.png")]
+			var explosion:Class;
+			
+			addResource("explosion", explosion);
+			addResource("walker_walkLeft", walkerLeft);
+			addResource("walker_walkRight", walkerRight);
+			
+			addResource("walker_attackLeft", attack);
+			addResource("walker_attackRight", attackR);
+			
+			addResource("walker_damagedRight", damagedR);
+			
+			addResource("turret", turret);
+		}
+		
+		public function addSoundEffects():void
+		{
+			[Embed(source = "../media/sounds/effects/bullet_shoot.mp3")]
+			var sound:Class;
+			
+			[Embed(source = "../media/sounds/effects/bullet_hit_wall.mp3")]
+			var hitWall:Class;
+			
+			[Embed(source = "../media/sounds/effects/bullet_hit_enemy.mp3")]
+			var hitEnemy:Class;
+			
+			[Embed(source = "../media/sounds/effects/bullet_hit.mp3")]
+			var hit:Class;
+			
+			[Embed(source = "../media/sounds/effects/enemy_charge.mp3")]
+			var charge1:Class;
+			
+			addSound("bullet_hit", hit);
+			addSound("bullet_shoot", sound);
+			addSound("bullet_hit_wall", hitWall);
+			addSound("bullet_hit_enemy", hitEnemy);
+			addSound("enemy_charge", charge1);
 		}
 		
 		public function addResource(name:String, img:Class)
@@ -101,6 +181,37 @@ package
 			return mImages[name];
 		}
 		
+		public function addAnimationBank(bank:AnimationBank):void
+		{
+			mAnimationBanks[bank.Path] = bank;
+		}
+	
+		public function hasAnimationBank(name:String):Boolean
+		{
+			return mAnimationBanks.hasOwnProperty(name);
+		}
+	
+		public function getAnimationBank(name:String):AnimationBank
+		{
+			return mAnimationBanks[name];
+		}
+		
+		public function addSound(name:String, obj:Class)
+		{
+			if (!hasSound(name))
+				mSound[name] = obj;
+		}
+		
+		public function hasSound(name:String):Boolean
+		{
+			return mSound.hasOwnProperty(name);
+		}
+		
+		public function getSound(name:String):Class
+		{
+			return mSound[name];
+		}
+	
 		[Embed(source = "../media/Player_sheet.png")]
 		public static var Player_Sheet:Class;
 		
@@ -164,7 +275,7 @@ package
 		public static var Tile_Locked:Class;
 		
 		//[Embed(source = "../media/rouge_tiles.png")]
-		[Embed(source = "../media/simpleTiles.png")]
+		[Embed(source = "../media/simpleTilesOriginal.png")]
 		public static var Map_Tile_2:Class;
 		
 		
@@ -179,6 +290,7 @@ package
 		
 		[Embed(source = "../media/wallSwitch.png")]
 		public static var WallSwitch:Class;
+		
 	}
 
 }
