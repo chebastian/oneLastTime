@@ -1,6 +1,10 @@
 package  
 {
+	import AttackReactions.DamageReaction;
+	import CharacterController.InputController;
 	import CharacterStates.AttackState;
+	import CharacterStates.DeathState;
+	import CharacterStates.PlayerDeathState;
 	import flash.accessibility.AccessibilityImplementation;
 	import flash.display.Loader;
 	import flash.events.Event;
@@ -8,6 +12,7 @@ package
 	import flash.net.NetGroupReplicationStrategy;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import org.flixel.system.input.Input;
 	import PlayerCharacter;
 	import org.flixel.*;
 	import com.adobe.serialization.json.JSON;
@@ -36,7 +41,7 @@ package
 			mHitBox = new GameObject(this.x, this.y, null);
 			srcWH = new Point(8, 12);
 			
-			SetSpeed(20);
+			SetSpeed(25);
 			scale.x = 1;
 			scale.y = 1;
 			//mAABBOffset = new Point(-10, 6);
@@ -49,8 +54,8 @@ package
 			//mAABBHeightOffset = 12;
 			//mAABBWidthOffset = 15;
 			
-			mHitBoxSizeOffset = new Point(0, 0);
-			mHitBoxPosOffset = new Point(0, 0);
+			mHitBoxSizeOffset = new Point(-2, -2);
+			mHitBoxPosOffset = new Point(1, 0);
 			mHitBox.width = width * this.scale.y;
 			mHitBox.height= this.height * this.scale.y;
 			
@@ -61,6 +66,9 @@ package
 			mAnimationFrameRate = 2;
 			mAnimationsPath = "../media/player/player_anim.txt";
 			mShadow = new FlxSprite(x, y, mGame.getResources().getResource("playerShadow"));
+			mReactions.pushReaction(new DamageReaction(this, 100));
+			
+			mController = new InputController(this, mGame);
 		}
 		
 		public override function onAnimationLoadComplete(e:Event):void 
@@ -74,6 +82,10 @@ package
 		{
 			super.update();
 				updateShadow();
+				
+				
+			if (mHealth < 0)
+				ChangeState(new PlayerDeathState(this));
 			this.mWeaponHitbox.x = this.x + (mHeading.x * this.mWeaponReach);
 			this.mWeaponHitbox.y = this.y + (mHeading.y * this.mWeaponReach);
 		}
@@ -112,24 +124,24 @@ package
 			else if (FlxG.keys.pressed("LEFT"))
 			{
 				Move(new Point( -1, 0), speed);
-				ChangeAnimation(this.Animation_WalkLeft, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkLeft);
 			}
 			
 			else if (FlxG.keys.pressed("RIGHT"))
 			{
 				Move(new Point( 1, 0), speed);
-				ChangeAnimation(this.Animation_WalkRight, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkRight);
 				this.facing = RIGHT;
 			}
 			else if (FlxG.keys.pressed("UP"))
 			{
 				Move(new Point( 0, -1), speed);
-				ChangeAnimation(this.Animation_WalkUp, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkUp);
 			}
 			else if (FlxG.keys.pressed("DOWN"))
 			{
 				Move(new Point( 0, 1), speed);
-				ChangeAnimation(this.Animation_WalkDown, GameResources.Player_Sheet);
+				ChangeAnimation(this.Animation_WalkDown);
 			}
 			else
 			{
@@ -144,6 +156,18 @@ package
 				//mGame.getBulletMgr().addBullet(factory.createRayFromCharacter(this, 5, 50)); 
 				mGame.getBulletMgr().addBullet(factory.createBulletFromCharacter(this, 0.2, 50));
 			}
+		}
+		
+		override public function OnHitCharacter(char:Character):Boolean 
+		{
+			if (mHitBox.overlaps(char) && char.Attacking())
+			{
+				mReactions.getReaction().onAttacked();
+				return true;
+			}
+			
+			return false;
+			//return super.OnHitCharacter(char);
 		}
 		
 	}

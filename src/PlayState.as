@@ -18,6 +18,7 @@ package
 	import LevelMap;
 	import org.flixel.FlxTileblock;
 	import org.flixel.system.FlxList;
+	import Tests.BeamSwitchTest;
 	import Tests.TurretTest;
 	import Tests.WalkerTest;
 	import TransitionEffect;
@@ -46,6 +47,7 @@ package
 		public var LAYER_ITEM:FlxGroup;
 		public var LAYER_ENEMY:FlxGroup;
 		public var LAYER_FRONT:FlxGroup;
+		public var LAYER_TEST:FlxGroup;
 		
 		public var PlayerCurrentItems:FlxGroup;
 		public var Keys:uint;
@@ -58,6 +60,7 @@ package
 		
 		private var mWalkerTest:WalkerTest;
 		private var mTurretTest:TurretTest;
+		private var mBeamTest:BeamSwitchTest;
 		
 		private var mResources:GameResources;
 		
@@ -73,7 +76,7 @@ package
 			mResources = new GameResources();
 			mResources.initResources();
 			
-			FlxG.debug = false;
+			FlxG.debug = true;
 			//testCamera();
 			CreateLayers();
 			LAYER_BKG.add(new FlxText(0, 0, 100, "PLAYSTATE"));
@@ -91,13 +94,16 @@ package
 			LAYER_ENEMY.add(mPlayer);
 			mCellLevel = new CellLevel(this);
 			//mCellLevel.LoadLevel("../media/levels/wip/wip.xml");
-			mCellLevel.LoadLevel("../media/levels/testy/testy.xml");
+			mCellLevel.LoadLevel("../media/levels/enemyTest/enemyTest.xml");
+			//mCellLevel.LoadLevel("../media/Levels/entTest/entTest.xml");
 			
 			mBulletMgr = new BulletManager(this);
 //			mBulletTest = new BulletTest(this);
 			mWalkerTest = new WalkerTest(this);
 		//	mWalkerTest.initTest();
 			mTurretTest = new TurretTest(this);
+			
+			mBeamTest = new BeamSwitchTest(this);
 			
 		}
 		
@@ -145,6 +151,7 @@ package
 				LAYER_ITEM = new FlxGroup();
 				LAYER_ENEMY = new FlxGroup();
 				LAYER_FRONT = new FlxGroup();
+				LAYER_TEST = new FlxGroup();
 				
 				add(LAYER_BKG);
 				add(LAYER_BKG1);
@@ -152,6 +159,7 @@ package
 				add(LAYER_MID);
 				add(LAYER_ENEMY);
 				add(LAYER_FRONT);
+				add(LAYER_TEST);
 		}
 		
 		public function FadeComplete(e:Event):void
@@ -196,6 +204,7 @@ package
 			super.update();
 			FlxG.collide(mPlayer, mCellLevel.ActiveRoom().MapCollisionData());
 			FlxG.collide(getBulletMgr().getActiveBullets(), mCellLevel.ActiveRoom().MapCollisionData());
+			FlxG.collide(getBulletMgr().getActiveBullets(), mCellLevel.ActiveRoom().mRaisableWalls);
 			
 			HandleEnemyCollision();
 			HandleDebugInput();
@@ -204,8 +213,8 @@ package
 			//mBulletTest.handleInput();
 			//mBulletTest.testUpdate();
 			//testUpdateCam();
-			mWalkerTest.testUpdate();
-			mTurretTest.udpate();
+			//mWalkerTest.testUpdate();
+			//mTurretTest.udpate();
 			updateBullets();
 		}
 		
@@ -239,6 +248,7 @@ package
 				mCellLevel.ActiveRoom().testSwitch();
 			}
 			}
+		
 			
 			if (FlxG.keys.justPressed('F1'))
 			{
@@ -260,6 +270,13 @@ package
 			if (FlxG.keys.justPressed('F3'))
 			{
 				mCellLevel.testreloadLevel();
+			}
+			
+				
+			
+			if (FlxG.keys.justPressed('F4'))
+			{
+				mBeamTest.init();	
 			}
 		}
 		
@@ -329,8 +346,9 @@ package
 			
 			if (ActiveLevel().LoadFinished)
 			{
-				mWalkerTest.initTest();
-				mTurretTest.inti();
+				//mWalkerTest.initTest();
+				//mTurretTest.inti();
+				//mBeamTest.init();
 			}
 		}
 		

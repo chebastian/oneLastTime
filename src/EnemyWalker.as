@@ -2,6 +2,7 @@ package
 {
 	import AttackReactions.DamageReaction;
 	import CharacterStates.DamagedState;
+	import CharacterStates.HitImmuneState;
 	import CharacterStates.IdleState;
 	import CharacterStates.WalkerChargeState;
 	import CharacterStates.WanderState;
@@ -34,6 +35,7 @@ package
 			mHitBoxSizeOffset.x = -4;
 			mHitBoxSizeOffset.y = -4;
 			mHitBoxPosOffset.x = 2;
+			mBulletOriginOffset = new Point(0, 2);
 		}
 		
 		override public function InitAnimations():void 
@@ -60,6 +62,7 @@ package
 			{
 				mLookAt.x = mHeading.x;
 				mLookAt.normalize(1.0);
+				mLookAt.y = 0;
 			}
 		}
 		
@@ -70,21 +73,9 @@ package
 				var d:Number = distanceBetween(mGame.ActivePlayer());
 				var minD:Number = 64;
 				trace(d);
-				if(!IsInState(WalkerChargeState.WALKER_STATEID) && d < minD && canSeeCharacter(mGame.ActivePlayer()))
+				if(!IsInState(CharacterState.DAMAGED_STATE) && !IsInState(WalkerChargeState.WALKER_STATEID) && d < minD && canSeeCharacter(mGame.ActivePlayer()))
 					ChangeState(new WalkerChargeState(this));
 			}
-		 }
-		 
-		 public function canSeeCharacter(char:Character):Boolean {
-			 var mid:FlxPoint = getMidpoint();
-			 var charMid:FlxPoint = char.getMidpoint();
-			 var topDist:Number = y - char.y;
-			 var bottomDist:Number = (y + height) - (char.y + char.height);
-			 
-			 if (Math.abs((mid.y - charMid.y)) < 2)
-				return areFacingEachother(char);
-			 
-			 return false;
 		 }
 		
 		override public function draw():void 
@@ -115,14 +106,37 @@ package
 				
 			if (char.Attacking() && mHitBox.overlaps(char))
 			{
-				ChangeState(new DamagedState(this));
-				char.OnHitCharacter(this);
-				mReactions.getReaction().onAttacked();
-				 FlxG.play(mGame.getResources().getSound("bullet_hit_enemy"),1.0);
-				return true;
+				if (areLookingAtEachOther(char))
+				{
+					ChangeState(new DamagedState(this));
+					char.OnHitCharacter(this);
+					mReactions.getReaction().onAttacked();
+					FlxG.play(mGame.getResources().getSound("bullet_hit_enemy"),1.0);
+				
+					return true;
+				}
+				
+				else
+				{
+					ChangeState(new HitImmuneState(this));
+					FlxG.play(mGame.getResources().getSound("immune1"),1.0);
+					return true;
+				}
 			}
+			return mHitBox.overlaps(char);
+		}
+		
+		protected function areLookingAtEachOther(char:Character):Boolean
+		{
+			var toChar:Point = char.getLookAt();
+			toChar.normalize(1.0);
 			
-			return false;
+			var dot:Number = (getLookAt().x * toChar.x) + (getLookAt().y * toChar.y);
+			
+			
+			var result = areFacingEachother(char) && dot < 0.0;
+			
+			return result;
 		}
 		
 	}

@@ -42,6 +42,7 @@ package
 			super.update();
 			if (mHealth <= 0 && !IsInState(CharacterState.DEATH_STATE))
 				ChangeState(new DeathState(this));
+				
 		}
 	}
 

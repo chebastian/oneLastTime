@@ -36,7 +36,7 @@ package CharacterStates
 			if (mTurret.finished && mTurret.canSeeCharacter(mGame.ActivePlayer()) && mTurret.getWeapon().canFire())
 			{
 				var factory:BulletFactory = new BulletFactory(mGame);
-				var bull:Bullet  = factory.createBulletFromCharacter(mTurret, mTurret.getWeapon().getFireLength(), 50);
+				var bull:Bullet  = factory.createBulletFromCharacterWeapon(mTurret);
 				mGame.getBulletMgr().addBullet(bull);
 			}
 		}

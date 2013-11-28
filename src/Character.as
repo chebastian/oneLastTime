@@ -5,7 +5,9 @@ package
 	 * @author Sebastian Ferngren
 	 */
 	
+	 import adobe.utils.ProductManager;
 	 import AttackReactions.ReactionManager;
+	 import CharacterController.CharacterController;
 	 import CharacterStates.IdleState;
 	 import CharacterStates.WanderState;
 	 import flash.display.ShaderParameter;
@@ -16,6 +18,9 @@ package
 	 import flash.net.URLRequest;
 	 import flash.printing.PrintJobOrientation;
 	 import GameObject;
+	 import CharacterController.*;
+	 import org.flixel.FlxPoint;
+	 
 	public class Character extends GameObject
 	{
 		
@@ -51,11 +56,12 @@ package
 		var mHealth:Number;
 		
 		var mWeaponHitbox:GameObject;
-		var mHitBox:GameObject;
+		protected var mHitBox:GameObject;
 		
 		var mHitBoxPosOffset:Point;
 		var mHitBoxSizeOffset:Point;
 		protected var srcWH:Point;
+		protected var mSpawnPoint:Point;
 		
 		/*Loader for JSON*/
 		var mLoaderJSON:URLLoader;
@@ -65,6 +71,11 @@ package
 		var mAnimations:AnimationBank;
 		protected var mAnimationsPath:String;
 		var mCurrentImg:Class;
+		
+		/*Character controllers*/
+		var mController:CharacterController;
+		
+		
 		
 		/*Char attackreacktion*/
 		protected var mReactions:ReactionManager;
@@ -99,6 +110,7 @@ package
 			mAnimations = new AnimationBank();
 			mReactions = new ReactionManager(this);
 			mAnimationsPath = "";
+			mController = new CharacterController(this, mGame);
 			//Init();
 		}
 		
@@ -114,6 +126,7 @@ package
 			mHitBoxPosOffset = new Point(0, 0);
 			mHitBoxSizeOffset = new Point(0, 0);
 			mCurrentWeapon = new Weapon(mGame, 1.0 / 3.0, 50, 0.5);
+			mSpawnPoint = new Point(x, y);
 		}
 		
 		public virtual function InitAnimations():void
@@ -199,17 +212,23 @@ package
 			mHeading = dir;
 			updateLookAt();
 		}
+		
+		public function ChangeAnimationForced(name:String, img:Class = null):void
+		{
+			ChangeAnimation(name, img, true);
+		}
+		
 		public function ChangeAnimation(name:String, img:Class = null,force:Boolean = false):void
 		{
 	
 			if(IsPlayingAnimation(name) && !force)
 				return;
 				
-			if (img != null)
+			/*if (img != null)
 			{
 				loadGraphic(img,true,false,srcWH.x,srcWH.y);
 				mCurrentImg = img;
-			}
+			}*/
 			
 			if (mAnimations.containsClip(name))
 			{
@@ -222,6 +241,9 @@ package
 				}*/
 				
 				var clip:AnimationClip = mAnimations.getAnimation(name);
+				if (img != null)
+					clip = mAnimations.getAnimationFromImg(img, name);
+					
 				if (clip.src != null)
 					loadGraphic(clip.src, true , false, clip.fw, clip.fh, false);
 					
@@ -237,6 +259,7 @@ package
 			play(name);
 			mCurrentAnimation = name;
 		}
+		
 		
 		public function revertAnimationTransformations():void
 		{
@@ -261,6 +284,7 @@ package
 		{
 			super.update();
 			mState.OnUpdate();
+			mController.update();
 			UpdateHitbox();
 			updateLookAt();
 		}
@@ -378,6 +402,21 @@ package
 			return false;
 		}
 		
+		
+		 
+		 public function canSeeCharacter(char:Character):Boolean {
+			 var mid:FlxPoint = getMidpoint();
+			 var charMid:FlxPoint = char.getMidpoint();
+			 var topDist:Number = y - char.y;
+			 var bottomDist:Number = (y + height) - (char.y + char.height);
+			 var minMidDist:Number = 2.0;
+			 
+			 if (Math.abs((mid.y - charMid.y)) < minMidDist)
+				return areFacingEachother(char);
+			 
+			 return false;
+		 }
+		
 		public function JustHitWall():Boolean
 		{
 			return justTouched(LEFT | RIGHT | DOWN | UP);
@@ -386,6 +425,11 @@ package
 		public function Heading():Point
 		{
 			return mHeading;
+		}
+		
+		public function setHeading(p:Point):void
+		{
+			mHeading = p.clone();
 		}
 		
 		public function HitBox():GameObject
@@ -475,6 +519,40 @@ package
 			var fireRate:Number = 3.0 / 1.0;
 			var factory:BulletFactory = new BulletFactory(mGame);
 			mGame.getBulletMgr().addBullet(factory.createBulletFromCharacter(this, 0.5, 50));
+		}
+		
+		public function getAnimationBasedOnLookAt(left:String, right:String, up:String, down:String):String
+		{
+			if (getLookAt().x < 0)
+				return left;
+			else if (getLookAt().x > 0)
+				return right;
+			else if (getLookAt().y > 0)
+				return down;
+			else if (getLookAt().y < 0)
+				return up;
+				
+			return "";
+		}
+		
+		public function setSpawnPoint(p:Point):void
+		{
+			mSpawnPoint = p.clone();
+		}
+		
+		public function getSpawnPoint():Point
+		{
+			return mSpawnPoint.clone();
+		}
+		
+		public function setController(controller:CharacterController)
+		{
+			mController = controller;
+		}
+		
+		public function setAnimationSrc(src:String):void 
+		{
+			mAnimationsPath = src;
 		}
 	}
 

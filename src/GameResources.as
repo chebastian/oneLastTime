@@ -132,9 +132,17 @@ package
 			[Embed(source = "../media/enemy/turret/turret.png")]
 			var turret:Class;
 			
+			[Embed(source = "../media/enemy/turret/turretMirror.png")]
+			var turretMirror:Class;
+			
 			[Embed(source = "../media/explosion.png")]
 			var explosion:Class;
 			
+			[Embed(source = "../media/beam/beam.png")]
+			var beam:Class;
+			
+			addResource("beam", beam);
+			addResource("turretMirror", turretMirror);
 			addResource("explosion", explosion);
 			addResource("walker_walkLeft", walkerLeft);
 			addResource("walker_walkRight", walkerRight);
@@ -164,6 +172,10 @@ package
 			[Embed(source = "../media/sounds/effects/enemy_charge.mp3")]
 			var charge1:Class;
 			
+			[Embed(source = "../media/sounds/effects/enemy_immune3.mp3")]
+			var immune1:Class;
+			
+			addSound("immune1", immune1);
 			addSound("bullet_hit", hit);
 			addSound("bullet_shoot", sound);
 			addSound("bullet_hit_wall", hitWall);

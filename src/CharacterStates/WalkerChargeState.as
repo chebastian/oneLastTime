@@ -31,6 +31,7 @@ package CharacterStates
 		override public function OnUpdate():void 
 		{
 			super.OnUpdate();
+			mCharacter.StopMoving();
 			if (mCharacter.finished)
 			{
 				mCharacter.ChangeState(new WanderState(mCharacter));

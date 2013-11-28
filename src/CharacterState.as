@@ -18,6 +18,10 @@ package
 		public static var WANDER_STATE:uint = 2;
 		public static var DAMAGED_STATE:uint = 3;
 		public static var DEATH_STATE:uint = 4;
+		public static var PLAYER_DEATH_STATE:uint = 5;
+		
+		public static var CHARACTER_WALKING_STATE:uint = 90;
+		public static var CHARACTER_SPAWN_STATE:uint = 100;
 		
 		public function CharacterState(id:uint, char:Character) 
 		{

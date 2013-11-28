@@ -34,7 +34,7 @@ package
 		{
 			super.update();
 				
-			HandleInput();
+			//HandleInput();
 		}
 		
 		public function HandleInput():void

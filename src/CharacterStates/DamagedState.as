@@ -25,9 +25,9 @@ package CharacterStates
 		public function changeAnimBasedOnDir():void
 		{
 			if(mCharacter.Heading().x > 0)
-				mCharacter.ChangeAnimation(mCharacter.Animation_DamagedR);
+				mCharacter.ChangeAnimation(mCharacter.Animation_DamagedR,null,true);
 			else if (mCharacter.Heading().x < 0)
-				mCharacter.ChangeAnimation(mCharacter.Animation_DamagedL);
+				mCharacter.ChangeAnimation(mCharacter.Animation_DamagedL,null,true);
 		}
 		
 		override public function OnExit():void 

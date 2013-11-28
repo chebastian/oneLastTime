@@ -11,8 +11,9 @@ package
 		protected var mFireLength:Number;
 		protected var mFireSpeed:Number;
 		protected var mGame:PlayState;
-		
 		protected var mLastTime:Number;
+		protected var mBulletSrc:String;
+		protected var mBulletPrototype:Bullet;
 		
 		public function Weapon(game:PlayState, fireRate:Number, speed:Number, length:Number) 
 		{
@@ -21,8 +22,23 @@ package
 			mFireSpeed = speed;
 			mFireRate = fireRate;
 			mLastTime = 0.0;
+			mBulletSrc = "../media/player/bullet/bullet_anims.txt";
 		}
 		
+		public function setBulletPrototype(bul:Bullet):void
+		{
+			mBulletPrototype = bul.clone();
+		}
+		
+		
+		public function getBulletSrc():String
+		{
+			return mBulletSrc;
+		}
+		
+		public function setBulletStr(src:String):void {
+			mBulletSrc = src;
+		}
 		public function getFireRate():Number
 		{
 			return mFireRate;
@@ -63,6 +79,11 @@ package
 			bullet.SetSpeed(mFireSpeed);
 			bullet.LifeTime = mFireLength;
 			return bullet;
+		}
+		
+		public function createBulletFromPrototype():Bullet
+		{
+			return mBulletPrototype.clone();
 		}
 	}
 

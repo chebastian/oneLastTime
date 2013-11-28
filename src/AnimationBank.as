@@ -11,12 +11,19 @@ package
 		var mAnimations:Array;
 		var Path:String;
 		private var LoadComplete:Boolean;
+		var mCurrentImg:Class;
 		
 		public function AnimationBank() 
 		{
 			Path = new String("Not Loaded");
 			mAnimations = new Array();
 			LoadComplete = false;
+			mCurrentImg = null;
+		}
+		
+		public function changeCurrentBase(img:Class):void
+		{
+			mCurrentImg = img;
 		}
 		
 		public function addAnimation(clip:AnimationClip)
@@ -35,27 +42,22 @@ package
 			return false;
 		}
 		
-		public function imgContainsAnimation(img:String, name:String):Boolean
+		public function getAnimationFromImg(img:Class, name:String):AnimationClip
 		{
-			for (var i:uint = 0; i < mAnimations.length; i++)
+			for each(var anim:AnimationClip in mAnimations)
 			{
-				var animation:AnimationClip = mAnimations[i];
-				if (animation.name == name)
-				{
-					if (animation.src == img)
-						return true;
-				}
+				if (anim.src == img && anim.name == name)
+					return anim;
 			}
-			return false;
-		}
-		
-		public function getAnimationFromImg(img:String, name:String):AnimationClip
-		{
 			
+			return null;
 		}
 		
 		public function getAnimation(name:String):AnimationClip
 		{
+			if (mCurrentImg != null)
+				return getAnimationFromImg(mCurrentImg, name);
+				
 			for (var i:uint = 0; i < mAnimations.length; i++)
 			{
 				if (mAnimations[i].name == name)

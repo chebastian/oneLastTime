@@ -53,6 +53,12 @@ package
 			
 		}
 		
+		override public function draw():void 
+		{
+			//drawDebug();
+			super.draw();
+		}
+		
 		public function OffsetBoundingBox(pos:Point, w:Number, h:Number)
 		{
 			width += w; height += h;

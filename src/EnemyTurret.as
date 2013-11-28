@@ -47,12 +47,15 @@ package
 		
 		public function changeAnimationBasedOnHeading():void
 		{
-			
-				
+			if (getLookAt().x < 0)
+				mAnimations.changeCurrentBase(mGame.getResources().getResource("turretMirror"));
+			else
+				mAnimations.changeCurrentBase(mGame.getResources().getResource("turret"));
 		}
 		
 		override public function update():void 
 		{
+			StopMoving();
 			super.update();
 			changeAnimationBasedOnHeading();
 		}

@@ -53,6 +53,7 @@ package
 		var mDebugString:FlxText;
 		var mClearedEvents:Array;
 		var mPickups:FlxGroup;
+		var mGlobalStateAtEnter:Boolean;
 		
 		static var FILE_EMPTY_ROOM:String = "../media/levels/level_1/empty.xml";
 		
@@ -228,6 +229,7 @@ package
 				door.exists = false;
 			}
 			mSolidObjects.clear();
+			mGame.getBulletMgr().removeAllBullets();
 			
 			clearLayersUsed();
 		}
@@ -310,6 +312,15 @@ package
 			for each(var bull:Bullet in mGame.getBulletMgr().getActiveBullets().members)
 			{
 				handleBulletEnemyCollision(bull);
+				handleBulletPlayerCollision(bull);
+			}
+		}
+		
+		public function handleBulletPlayerCollision(bullet:Bullet):void
+		{
+			if (bullet.Owner != mGame.ActivePlayer().GetUniqueId())
+			{
+				mGame.ActivePlayer().OnHitCharacter(bullet);
 			}
 		}
 		
@@ -393,6 +404,13 @@ package
 			else if (bound == BOUNDS_DOWN)
 			{
 				player.y = LEVEL_TOP + LEVEL_BUFFER_H*3;
+			}
+			
+			if (bound != BOUNDS_NONE)
+			{
+				player.setSpawnPoint(new Point(player.x, player.y));
+				mGlobalStateAtEnter = mGame.ActiveLevel().getGlobalSwitchState();
+				FlxG.flash(0x00000000,0.2);
 			}
 		}
 		
@@ -575,7 +593,8 @@ package
 				}
 				
 				SetEventStatus(EVT_ENEMY_CLEARED, false);
-				var createdEnemy:EnemyWalker = new EnemyWalker(mGame, enemyPos);
+				var factory:EnemyFactory = new EnemyFactory(mGame);
+				var createdEnemy:Enemy = factory.createEnemyFromXMLNode(enemy);//new EnemyWalker(mGame, enemyPos);
 				createdEnemy.Init();
 				//mGame.LAYER_ENEMY.add(createdEnemy);
 				mGameObjects.add(createdEnemy);
@@ -715,7 +734,7 @@ package
 		
 		public function testSwitch():void {
 			for each(var wallS:WallSwitch in mWallSwitches.members) {
-				wallS.onHit(mGame.ActivePlayer());
+				wallS.toggleOpen();
 			}
 		}
 			
@@ -725,6 +744,7 @@ package
 		
 		public function reloadRoom():void {
 			this.ClearLevel();
+			mGame.ActiveLevel().setGlobalSwitchState(mGlobalStateAtEnter);
 			this.OnEnter();
 		}
 		

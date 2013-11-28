@@ -48,7 +48,7 @@ package
 			mActiveRoom = new CellRoom(mGame, 0, "");
 			mClearedRooms = new Array();
 			mPickups = new FlxGroup();
-			mMiniMap = new MiniMap(this, -50, 0);
+			//mMiniMap = new MiniMap(this, -50, 0);
 			mWorkingDir = "../media/levels/";
 			mLevelName = "";
 			mGameObjects = new FlxGroup();
@@ -137,8 +137,8 @@ package
 			ParseLevelRooms(levelList);
 			
 			ChangeRoom(mRoomStartPoint);
-			mMiniMap = new MiniMap(this, 0, 0);
-			mMiniMap.GenerateMap();
+			//mMiniMap = new MiniMap(this, 0, 0);
+			//mMiniMap.GenerateMap();
 			LoadFinished = true;
 			//mGame.onEnterLevel();
 			//mGame.add(mMiniMap);
@@ -509,9 +509,9 @@ package
 		
 		protected function UpdateMiniMap():void
 		{
-			if (mMiniMap != null)
+			//if (mMiniMap != null)
 			{
-				mMiniMap.SetActiveTile(mActiveIndex);
+				//mMiniMap.SetActiveTile(mActiveIndex);
 			}
 		}
 		
@@ -611,7 +611,7 @@ package
 			mActiveRoom = new CellRoom(mGame, 0, "");
 			mClearedRooms = new Array();
 			mPickups = new FlxGroup();
-			mMiniMap = new MiniMap(this, -50, 0);
+			//mMiniMap = new MiniMap(this, -50, 0);
 			mWorkingDir = "../media/levels/";
 			mLevelName = "";
 			mGameObjects = new FlxGroup();

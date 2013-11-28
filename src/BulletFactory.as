@@ -19,7 +19,8 @@ package
 			var x:int = new int(char.getBulletOrigin().x);
 			var y:int = new int(char.getBulletOrigin().y);
 			
-			var bullet:Bullet = new Bullet(mGame, x, y,new Point(char.getLookAt().x,char.getLookAt().y));
+			var bullet:Bullet = new Bullet(mGame, x, y, new Point(char.getLookAt().x, char.getLookAt().y));
+			bullet.setAnimationSrc(char.getWeapon().getBulletSrc());
 
 			bullet.Init();
 			bullet.SetSpeed(speed);
@@ -30,6 +31,12 @@ package
 
 			bullet.InitAnimations();
 			
+			return bullet;
+		}
+		
+		public function createBulletFromCharacterWeapon(char:Character):Bullet
+		{
+			var bullet = this.createBulletFromCharacter(char, char.getWeapon().getFireLength(), char.getWeapon().getBulletSpeed());
 			return bullet;
 		}
 		
