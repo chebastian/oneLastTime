@@ -28,6 +28,12 @@
 					"origin_y":"0",
 					"name":"fire",
 					"frames":"1,2"
+				},
+				{
+					"origin_x":"0",
+					"origin_y":"0",
+					"name":"explode",
+					"frames":"4,5"	
 				}
 			]
 		}
